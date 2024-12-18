@@ -1,0 +1,9 @@
+Tipo: 31, Lexema: elfo, Línea: 0, Columna: 0
+Tipo: 12, Lexema: navidad, Línea: 0, Columna: 5
+Tipo: 42, Lexema: _verano_, Línea: 0, Columna: 14
+Tipo: 43, Lexema: _hola_, Línea: 0, Columna: 24
+Tipo: 44, Lexema: 98, Línea: 0, Columna: 31
+Tipo: 45, Lexema: 7.3, Línea: 0, Columna: 34
+Tipo: 46, Lexema: true, Línea: 0, Columna: 38
+Tipo: 47, Lexema: c, Línea: 0, Columna: 43
+Tipo: 2, Lexema: rodolfo, Línea: 0, Columna: 47

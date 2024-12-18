@@ -6,7 +6,7 @@
 package proyecto1;
 
 /** CUP generated class containing symbol constants. */
-public class sym {
+public class Sym {
   /* terminals */
   public static final int NOT_EQUAL_TO = 25;
   public static final int INCREMENT = 18;
@@ -24,6 +24,7 @@ public class sym {
   public static final int SEMICOLON = 29;
   public static final int AND = 26;
   public static final int OR = 27;
+  public static final int COMMA = 49;
   public static final int BOOL_VAL = 46;
   public static final int LEFT_BRACE = 7;
   public static final int DIV = 15;
@@ -106,7 +107,8 @@ public class sym {
   "FLOAT_VAL",
   "BOOL_VAL",
   "CHAR_VAL",
-  "STRING_VAL"
+  "STRING_VAL",
+  "COMMA"
   };
 }
 

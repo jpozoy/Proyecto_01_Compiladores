@@ -1,1 +1,1 @@
-elfo navidad d _verano_  _hola_ 98 7.3 true 'c' rodolfo
+elfo navidad  _verano_  _hola_ 98 7.3 true 'c' rodolfo

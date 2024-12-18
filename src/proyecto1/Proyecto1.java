@@ -16,89 +16,138 @@ import proyecto1.sym;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.FileReader; 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.Files;
+import java.io.*;
+import java.nio.file.*;
+import java.util.Scanner;
 
 
 public class Proyecto1 {
-    // GENERAR LEXER: C:\Users\gerar\OneDrive\AAA TEC\Verano 2024\Proyecto_01_Compiladores\dist\lib>java -jar jflex-full-1.9.1.jar "C:\Users\gerar\OneDrive\AAA TEC\Verano 2024\Proyecto_01_Compiladores\src\proyecto1\scanner.flex"
-    
-    public static void main(String[] args) throws Exception{
-        Path rutaArchivo = Paths.get("src", "pruebas", "p1.txt");
-//        generarLexer("C:/Users/gerar/OneDrive/AAA TEC/Verano 2024/Proyecto_01_Compiladores/src/proyecto1/scanner.flex");
-//        generarCup("C:/Users/gerar/OneDrive/AAA TEC/Verano 2024/Proyecto_01_Compiladores/src/proyecto1/cup.cup");
-        // java -jar "C:\Users\gerar\OneDrive\AAA TEC\Verano 2024\Proyecto_01_Compiladores\dist\lib\java-cup-11b.jar" "C:\Users\gerar\OneDrive\AAA TEC\Verano 2024\Proyecto_01_Compiladores\src\proyecto1\cup.cup"
-        //probarLexer("../pruebas/p1.txt");
-         // Verifica si el archivo existe antes de probar el lexer
-        if (!Files.exists(rutaArchivo)) {
-            System.err.println("El archivo no existe: " + rutaArchivo.toAbsolutePath());
-            return;
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        boolean continuar = true;
+
+        while (continuar) {
+            System.out.println("\nMenu Principal");
+            System.out.println("1. Generar Lexer.java");
+            System.out.println("2. Generar Parser.java y sym.java");
+            System.out.println("3. Procesar archivo de entrada y escribir tokens");
+            System.out.println("4. Eliminar archivos generados (Lexer,parser,sym)");
+            System.out.println("5. Salir");
+            System.out.print("Seleccione una opcion: ");
+
+            String opcion = scanner.nextLine();
+
+            switch (opcion) {
+                case "1":
+                    //System.out.print("Ingrese la ruta del archivo scanner.flex: ");
+                    //String rutaLexer = scanner.nextLine();
+                    try {
+                        generarLexer("src/proyecto1/scanner.flex");
+                        System.out.println("Lexer.java generado correctamente.");
+                    } catch (Exception e) {
+                        System.err.println("Error al generar Lexer.java: " + e.getMessage());
+                    }
+                    break;
+
+                case "2":
+                    System.out.print("Ingresa la ruta del archivo parser.cup: ");
+                    //String rutaParser = scanner.nextLine();
+                    try {
+                        generarCup("src/proyecto1/cup.cup");
+                        System.out.println("parser.java y sym.java generados correctamente.");
+                    } catch (Exception e) {
+                        System.err.println("Error al generar Parser.java y sym.java: " + e.getMessage());
+                    }
+                    break;
+
+                case "3":
+                    System.out.print("Ingresa la ruta del archivo de entrada: ");
+                    String rutaEntrada = scanner.nextLine();
+                    System.out.print("Ingresa la ruta del archivo de salida: ");
+                    String rutaSalida = scanner.nextLine();
+                    try {
+                        escribirTokens(rutaEntrada, rutaSalida);
+                        System.out.println("Tokens procesados y guardados en " + rutaSalida);
+                    } catch (Exception e) {
+                        System.err.println("Error al procesar el archivo de entrada: " + e.getMessage());
+                    }
+                    break;
+                case "4":
+                    try {
+                        eliminarArchivos("src/proyecto1/Lexer.java", "src/proyecto1/parser.java", "src/proyecto1/sym.java");
+                        System.out.println("Archivos generados eliminados correctamente.");
+                    } catch (Exception e) {
+                        System.err.println("Error al eliminar archivos: " + e.getMessage());
+                    }
+                    break;
+                case "5":
+                    continuar = false;
+                    System.out.println("Saliendo del programa...");
+                    break;
+
+                default:
+                    System.out.println("Opcion no valida. Intenta nuevamente.");
+            }
         }
 
-        try {
-            probarLexer(rutaArchivo.toString());
-            // Escribir tokens en archivo
-            escribirTokens(rutaArchivo.toString(), "src/pruebas/salida.txt");
-        } catch (Exception e) {
-            System.err.println("Ocurrió un error: " + e.getMessage());
-        }
+        scanner.close();
     }
 
-    
-    public static void generarLexer(String path) throws IOException, Exception {
+    public static void generarLexer(String path) throws Exception {
         String[] arr = {path};
         jflex.Main.generate(arr);
     }
-    public static void generarCup(String path) throws IOException, Exception {
-        String[] arr = {path};
+
+    public static void generarCup(String path) {
+    try {
+        //
+        String outputDir = "src/proyecto1";
+
+        // Ruta al archivo CUP
+        File file = new File(path);
+        if (!file.exists()) {
+            throw new FileNotFoundException("El archivo CUP no existe: " + path);
+        }
+        // Opciones para java_cup con la ruta del directorio de salida
+        String[] arr = {"-parser", "parser", "-symbols", "sym", "-destdir", outputDir, path};
         java_cup.Main.main(arr);
-    }
-    
-    public static void probarLexer(String rutaArchivo){
-        try {
-            // Asegúrate de que la ruta al archivo de entrada esté correcta.
-            //String input = "elfo navidad d _verano_  _hola_ 98 7.3 true 'c'"; // Prueba de ejemplo, o usa un archivo de texto
 
-            // Crea un StringReader con el texto de entrada (puedes reemplazarlo con un archivo si lo prefieres)
-            FileReader reader = new FileReader(rutaArchivo);
-
-            // Crea el analizador léxico (scanner) usando el lexer generado
-            Lexer scanner = new Lexer(reader); // Esto debería coincidir con el nombre de tu lexer generado
-
-            // Lee los tokens generados
-            Symbol token;
-            while ((token = scanner.next_token()).sym != sym.EOF) {
-                System.out.println("Token: " + token.sym + " - " + token.value);
-            }
-        } catch (Exception e) {
-            //e.printStackTrace();
-        }
-
-    }
-    
-    public static void escribirTokens(String rutaArchivo, String rutaSalida) {
-    try (BufferedWriter writer = new BufferedWriter(new FileWriter(rutaSalida))) {
-        FileReader reader = new FileReader(rutaArchivo);
-        Lexer scanner = new Lexer(reader); 
-
-        Symbol token;
-        // Escribir cada token en el archivo
-        while ((token = scanner.next_token()).sym != sym.EOF) {
-            String tipoToken = sym.terminalNames[token.sym]; 
-            String lexema = token.value != null ? token.value.toString() : "null";
-            int linea = token.left + 1; // se le suma 1 `yyline`
-            int columna = token.right + 1; // se le suma 1 a `yycolumn`
-
-            writer.write("Tipo de Token: " + tipoToken + ", Lexema: " + lexema +
-                         ", Línea: " + linea + ", Columna: " + columna);
-            writer.newLine();
-        }
-        System.out.println("Los tokens se han guardado correctamente en " + rutaSalida);
-    } catch (IOException e) {
-        System.err.println("Error al escribir en el archivo: " + e.getMessage());
+        System.out.println("Parser y símbolos generados correctamente en: " + outputDir);
+    } catch (FileNotFoundException e) {
+        System.err.println("Error: " + e.getMessage());
     } catch (Exception e) {
-        System.err.println("Error al analizar los tokens: " + e.getMessage());
+        System.err.println("Error al generar CUP: " + e.getMessage());
+        }
+   }
+
+    //Metodo para escribir los tokens en un archvo de salida
+    public static void escribirTokens(String rutaArchivo, String rutaSalida) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(rutaSalida))) {
+            FileReader reader = new FileReader(rutaArchivo);
+            Lexer scanner = new Lexer(reader);
+            Symbol token;
+
+            while ((token = scanner.next_token()).sym != sym.EOF) {
+                writer.write("Tipo: " + token.sym + ", Lexema: " + token.value +
+                             ", Linea: " + token.left + ", Columna: " + token.right);
+                writer.newLine();
+            }
+
+            System.out.println("Tokens escritos correctamente en " + rutaSalida);
+        }
     }
-  }
+    
+    // Método para eliminar los archivos generados
+    public static void eliminarArchivos(String... archivos) throws IOException {
+        for (String archivo : archivos) {
+            Path path = Paths.get(archivo);
+            try {
+                Files.delete(path);
+                System.out.println("Archivo eliminado: " + archivo);
+            } catch (IOException e) {
+                System.err.println("Error al eliminar archivo: " + archivo + " - " + e.getMessage());
+            }
+        }
+    }
 }
