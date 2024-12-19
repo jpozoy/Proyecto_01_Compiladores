@@ -57,6 +57,9 @@ ONELINE_COMMENT=\#.*
 "abreempaque" {return symbol(sym.LEFT_BRACE, "abreempaque");}
 "cierraempaque" {return symbol(sym.RIGHT_BRACE, "cierraempaque");}
 
+"abrecuento" {return symbol(sym.LEFT_SQUARE_BRACKET, "abrecuento");}
+"cierracuento" {return symbol(sym.RIGHT_SQUARE_BRACKET, "cierracuento");}
+
 "entrega" {return symbol(sym.ASSIGNMENT, "entrega");}
 
 "abreregalo" {return symbol(sym.LEFT_PARENTHESIS, "abreregalo");}

@@ -1,9 +1,15 @@
-Tipo de Token: IF, Lexema: elfo, Línea: 1, Columna: 1
-Tipo de Token: ADD, Lexema: navidad, Línea: 1, Columna: 6
-Tipo de Token: MAIN, Lexema: _verano_, Línea: 1, Columna: 16
-Tipo de Token: ID, Lexema: _hola_, Línea: 1, Columna: 26
-Tipo de Token: INTEGER_VAL, Lexema: 98, Línea: 1, Columna: 33
-Tipo de Token: FLOAT_VAL, Lexema: 7.3, Línea: 1, Columna: 36
-Tipo de Token: BOOL_VAL, Lexema: true, Línea: 1, Columna: 40
-Tipo de Token: CHAR_VAL, Lexema: c, Línea: 1, Columna: 45
-Tipo de Token: INTEGER, Lexema: rodolfo, Línea: 1, Columna: 49
+Tipo: 6, Lexema: bromista, Linea: 0, Columna: 0
+Tipo: 45, Lexema: _func1_, Linea: 0, Columna: 9
+Tipo: 10, Lexema: abreregalo, Linea: 0, Columna: 17
+Tipo: 4, Lexema: cupido, Linea: 0, Columna: 28
+Tipo: 45, Lexema: _x22_, Linea: 0, Columna: 35
+Tipo: 51, Lexema: ,, Linea: 0, Columna: 41
+Tipo: 4, Lexema: cupido, Linea: 0, Columna: 43
+Tipo: 45, Lexema: _x22_, Linea: 0, Columna: 50
+Tipo: 11, Lexema: cierraregalo, Linea: 0, Columna: 56
+Tipo: 12, Lexema: abrecuento, Linea: 0, Columna: 69
+Tipo: 4, Lexema: cupido, Linea: 1, Columna: 0
+Tipo: 45, Lexema: _miChar_, Linea: 1, Columna: 7
+Tipo: 9, Lexema: entrega, Linea: 1, Columna: 16
+Tipo: 49, Lexema: !, Linea: 1, Columna: 24
+Tipo: 31, Lexema: finregalo, Linea: 1, Columna: 28
