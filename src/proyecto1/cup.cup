@@ -10,6 +10,15 @@ parser code{:
         this.lexer = lexer; 
         this.symbolFactory = new DefaultSymbolFactory();
     }
+
+    public boolean syntaxErrors;
+    public void syntax_error(Symbol current_token) {
+        report_error(
+            "Syntax error at line " + (current_token.left+1) + ", column "
+            + current_token.right, null
+        );
+    }
+
 :}
 
 init with {::};
@@ -31,9 +40,64 @@ terminal COMMA;
 
 // No terminales
 non terminal program, program_aux;
+non terminal literal, comparator, operator;
+non terminal for, while, if, else, switch, single_case, cases, declaration, read, print, break, return;
+non terminal statement, expression, unary_operation, declaration;
+non terminal type, type_declaration;
+non terminal function_declaration, function_call, parameters, arguments;
 
 start with program;
 
 // Producciones
+type ::= INTEGER | BOOLEAN | CHAR | STRING | FLOAT;
+type_declaration ::= type ID;
+literal ::= ID 
+        | INTEGER_VAL 
+        | FLOAT_VAL 
+        | BOOL_VAL 
+        | CHAR_VAL 
+        | STRING_VAL;
+unary_operation ::= expression INCREMENT 
+                | expression DECREMENT;
+operator ::= ADD | SUB | MUL | DIV | MOD | TO_THE_POWER;
+comparator ::= LESS_THAN | LESS_OR_EQUAL_THAN | GREATER_THAN | GREATER_OR_EQUAL_THAN | EQUAL_TO | NOT_EQUAL_TO;
+logical_operator ::= AND | OR | NOT;
+expression ::= literal 
+            | expression operator expression 
+            | expression comparator expression 
+            | expression logical_operator expression
+            | LEFT_PARENTHESIS expression RIGHT_PARENTHESIS
+            | NOT expression
+            | SUB expression
+            | function_call;
+statement ::= for | while | if | else | switch | declaration | read | print | break | return;
+code_block ::= expression | statement | expression code_block | statement code_block |;
+
+declaration variable_declaration | function_declaration;
+variable_declaration ::= type_declaration SEMICOLON | type_declaration ASSIGNMENT expression SEMICOLON;
+function_declaration ::= type_declaration LEFT_PARENTHESIS parameters RIGHT_PARENTHESIS LEFT_BRACE code_block RIGHT_BRACE;
+parameters ::= type_declaration | type declaration COMMA parameters;
+function_call ::= ID LEFT_PARENTHESIS arguments RIGHT_PARENTHESIS SEMICOLON;
+arguments ::= expression | expression COMMA arguments |;
+
+return ::= RETURN expression SEMICOLON | RETURN SEMICOLON;
+read ::= INPUT LEFT_PARENTHESIS expression RIGHT_PARENTHESIS SEMICOLON;
+print ::= PRINT LEFT_PARENTHESIS expression RIGHT_PARENTHESIS SEMICOLON;
+
+break ::= BREAK SEMICOLON;
+else ::= ELSE LEFT_BRACE code_block RIGHT_BRACE;
+if ::= IF LEFT_PARENTHESIS expression RIGHT_PARENTHESIS LEFT_BRACE code_block RIGHT_BRACE 
+    | IF LEFT_PARENTHESIS expression RIGHT_PARENTHESIS LEFT_BRACE code_block RIGHT_BRACE else;
+
+for_initialization ::= INTEGER ID | INTEGER ID ASSIGNMENT INTEGER_VAL;
+for ::= FOR LEFT_PARENTHESIS initialization SEMICOLON expression SEMICOLON unary_operation RIGHT_PARENTHESIS LEFT_BRACE code_block RIGHT_BRACE;
+while ::= WHILE LEFT_PARENTHESIS expression RIGHT_PARENTHESIS LEFT_BRACE code_block RIGHT_BRACE;
+
+single_case ::= CASE expression COLON code_block break;
+cases ::= single_case | single_case cases | cases DEFAULT COLON code_block;
+switch ::= SWITCH LEFT_PARENTHESIS expression RIGHT_PARENTHESIS 
+LEFT_BRACE cases RIGHT_BRACE;
+
+main ::= MAIN LEFT_PARENTHESIS RIGHT_PARENTHESIS LEFT_BRACE code_block RIGHT_BRACE;
 program ::= program_aux;
-program_aux ::= MAIN;
+program_aux ::= main;

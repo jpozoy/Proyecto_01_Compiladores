@@ -54,11 +54,11 @@ ONELINE_COMMENT=\#.*
 "cupido" {return symbol(sym.CHAR, "cupido");}
 "cometa" {return symbol(sym.STRING, "cometa");}
 
-"abreempaque" {return symbol(sym.LEFT_BRACE, "abreempaque");}
-"cierraempaque" {return symbol(sym.RIGHT_BRACE, "cierraempaque");}
+"abreempaque" {return symbol(sym.LEFT_BRACKET, "abreempaque");}
+"cierraempaque" {return symbol(sym.RIGHT_BRACKET, "cierraempaque");}
 
-"abrecuento" {return symbol(sym.LEFT_SQUARE_BRACKET, "abrecuento");}
-"cierracuento" {return symbol(sym.RIGHT_SQUARE_BRACKET, "cierracuento");}
+"abrecuento" {return symbol(sym.LEFT_SQUARE_BRACE, "abrecuento");}
+"cierracuento" {return symbol(sym.RIGHT_SQUARE_BRACE, "cierracuento");}
 
 "entrega" {return symbol(sym.ASSIGNMENT, "entrega");}
 
