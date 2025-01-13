@@ -23,11 +23,13 @@ parser code{:
 
 init with {::};
 
-scan with {: return lexer.next_token(); :}
+scan with {: Symbol sym = lexer.next_token();
+            //System.out.println("Token procesado: " + sym); // Imprime el token procesado
+            return sym;:}
 
 // Terminales
 terminal INTEGER, BOOLEAN, CHAR, STRING, FLOAT;
-terminal LEFT_BRACE, RIGHT_BRACE, ASSIGNMENT, LEFT_PARENTHESIS, RIGHT_PARENTHESIS, LEFT_SQUARE_BRACKET, RIGHT_SQUARE_BRACKET;
+terminal LEFT_BRACE, RIGHT_BRACE, LEFT_BRACKET, RIGHT_BRACKET, ASSIGNMENT, LEFT_PARENTHESIS, RIGHT_PARENTHESIS;
 terminal ADD, SUB, MUL, DIV, MOD, TO_THE_POWER;
 terminal INCREMENT, DECREMENT;
 terminal LESS_THAN, LESS_OR_EQUAL_THAN, GREATER_THAN, GREATER_OR_EQUAL_THAN, EQUAL_TO, NOT_EQUAL_TO;
@@ -38,66 +40,151 @@ terminal MAIN;
 terminal ID, INTEGER_VAL, FLOAT_VAL, BOOL_VAL, CHAR_VAL, STRING_VAL;
 terminal COMMA;
 
+
 // No terminales
-non terminal program, program_aux;
-non terminal literal, comparator, operator;
-non terminal for, while, if, else, switch, single_case, cases, declaration, read, print, break, return;
-non terminal statement, expression, unary_operation, declaration;
+non terminal program, code_block, main;
+non terminal literal, comparator, arithmetic_operator, logical_operator;
+non terminal for, for_initialization, while, if, else, switch, single_case, cases, read, print, return;
+non terminal statement, expression, arithmetic_expression, relational_expression , logic_expression,unary_operation;
 non terminal type, type_declaration;
-non terminal function_declaration, function_call, parameters, arguments;
+non terminal declaration, variable_declaration, function_declaration;
+non terminal function_call, parameters, arguments;
+non terminal array_declaration, array_access, array_values_int, array_values_char;
+
+precedence left OR;       // Disyunción tiene menor precedencia
+precedence left AND;      // Conjunción tiene mayor precedencia que OR
+precedence right NOT;     // NOT tiene la mayor precedencia
+precedence left EQUAL_TO, NOT_EQUAL_TO;
+precedence left LESS_THAN, LESS_OR_EQUAL_THAN, GREATER_THAN, GREATER_OR_EQUAL_THAN;
+precedence left ADD, SUB;
+precedence left MUL, DIV, MOD;
+precedence right TO_THE_POWER;  // Precedencia más alta para potenciación
+precedence right INCREMENT, DECREMENT, NOT;  // Precedencia para unarios
+precedence right LEFT_PARENTHESIS;
 
 start with program;
 
-// Producciones
-type ::= INTEGER | BOOLEAN | CHAR | STRING | FLOAT;
+type ::= INTEGER
+       | BOOLEAN 
+       | CHAR 
+       | STRING
+       | FLOAT;
+
 type_declaration ::= type ID;
-literal ::= ID 
-        | INTEGER_VAL 
-        | FLOAT_VAL 
-        | BOOL_VAL 
-        | CHAR_VAL 
-        | STRING_VAL;
-unary_operation ::= expression INCREMENT 
-                | expression DECREMENT;
-operator ::= ADD | SUB | MUL | DIV | MOD | TO_THE_POWER;
-comparator ::= LESS_THAN | LESS_OR_EQUAL_THAN | GREATER_THAN | GREATER_OR_EQUAL_THAN | EQUAL_TO | NOT_EQUAL_TO;
-logical_operator ::= AND | OR | NOT;
-expression ::= literal 
-            | expression operator expression 
-            | expression comparator expression 
-            | expression logical_operator expression
-            | LEFT_PARENTHESIS expression RIGHT_PARENTHESIS
-            | NOT expression
-            | SUB expression
-            | function_call;
-statement ::= for | while | if | else | switch | declaration | read | print | break | return;
-code_block ::= expression | statement | expression code_block | statement code_block |;
 
-declaration variable_declaration | function_declaration;
-variable_declaration ::= type_declaration SEMICOLON | type_declaration ASSIGNMENT expression SEMICOLON;
+literal ::= ID
+         | INTEGER_VAL 
+         | FLOAT_VAL
+         | BOOL_VAL 
+         | CHAR_VAL 
+         | STRING_VAL ;
+
+unary_operation ::= ID INCREMENT
+                | ID DECREMENT;
+
+arithmetic_operator ::= ADD 
+         | SUB 
+         | MUL 
+         | DIV 
+         | MOD
+         | TO_THE_POWER;
+
+comparator ::= LESS_THAN
+             | LESS_OR_EQUAL_THAN 
+             | GREATER_THAN 
+             | GREATER_OR_EQUAL_THAN 
+             | EQUAL_TO
+             | NOT_EQUAL_TO ;
+expression ::= arithmetic_expression | relational_expression | logic_expression;
+
+logical_operator ::= AND
+                   | OR 
+                   | NOT;
+arithmetic_expression ::= literal 
+            | function_call 
+            | LEFT_PARENTHESIS arithmetic_expression RIGHT_PARENTHESIS 
+            | arithmetic_expression arithmetic_operator arithmetic_expression 
+            | unary_operation
+            | array_access;
+relational_expression ::= arithmetic_expression comparator arithmetic_expression;
+logic_expression ::= expression AND expression
+                  | expression OR expression
+                  | NOT expression;
+
+function_call ::= ID LEFT_PARENTHESIS arguments RIGHT_PARENTHESIS;
+
+statement ::= for {: System.out.println("Stmt detectado: For"); :}
+            | while {: System.out.println("Stmt detectado: While"); :}
+            | if {: System.out.println("Stmt detectado: If"); :}
+            | else {: System.out.println("Stmt detectado: Else"); :}
+            | switch {: System.out.println("Stmt detectado: Switch"); :}
+            | declaration
+            | read {: System.out.println("Stmt detectado: Read"); :}
+            | print {: System.out.println("Stmt detectado: Print"); :}
+            | return {: System.out.println("Stmt detectado: Return"); :}
+            | function_call SEMICOLON {: System.out.println("Stmt detectado: Function Call"); :}
+            | NOT expression SEMICOLON {: System.out.println("Stmt detectado: NOT"); :}
+            | unary_operation SEMICOLON {: System.out.println("Stmt detectado: Operacion unaria"); :}
+            | array_declaration 
+            | array_access SEMICOLON;
+
+code_block ::= statement
+             | expression
+             | statement code_block
+             | expression code_block;
+
+declaration ::= variable_declaration {: System.out.println("Declaracion detectada: Variable"); :}
+              | function_declaration {: System.out.println("Declaracion detectada: Función"); :};
+
+variable_declaration ::= type_declaration SEMICOLON
+                        | type_declaration ASSIGNMENT expression SEMICOLON;
+
 function_declaration ::= type_declaration LEFT_PARENTHESIS parameters RIGHT_PARENTHESIS LEFT_BRACE code_block RIGHT_BRACE;
-parameters ::= type_declaration | type declaration COMMA parameters;
-function_call ::= ID LEFT_PARENTHESIS arguments RIGHT_PARENTHESIS SEMICOLON;
-arguments ::= expression | expression COMMA arguments |;
 
-return ::= RETURN expression SEMICOLON | RETURN SEMICOLON;
+parameters ::= type_declaration
+             | type_declaration COMMA parameters;
+
+arguments ::= expression 
+            | expression COMMA arguments ;
+
+return ::= RETURN expression SEMICOLON 
+         | RETURN SEMICOLON;
+
 read ::= INPUT LEFT_PARENTHESIS expression RIGHT_PARENTHESIS SEMICOLON;
+
 print ::= PRINT LEFT_PARENTHESIS expression RIGHT_PARENTHESIS SEMICOLON;
 
-break ::= BREAK SEMICOLON;
-else ::= ELSE LEFT_BRACE code_block RIGHT_BRACE;
-if ::= IF LEFT_PARENTHESIS expression RIGHT_PARENTHESIS LEFT_BRACE code_block RIGHT_BRACE 
-    | IF LEFT_PARENTHESIS expression RIGHT_PARENTHESIS LEFT_BRACE code_block RIGHT_BRACE else;
+if ::= IF LEFT_PARENTHESIS expression RIGHT_PARENTHESIS LEFT_BRACE code_block RIGHT_BRACE
+    | IF LEFT_PARENTHESIS expression RIGHT_PARENTHESIS LEFT_BRACE code_block RIGHT_BRACE ELSE LEFT_BRACE code_block RIGHT_BRACE;
 
-for_initialization ::= INTEGER ID | INTEGER ID ASSIGNMENT INTEGER_VAL;
-for ::= FOR LEFT_PARENTHESIS initialization SEMICOLON expression SEMICOLON unary_operation RIGHT_PARENTHESIS LEFT_BRACE code_block RIGHT_BRACE;
+for_initialization ::= type_declaration 
+                     | type_declaration ASSIGNMENT INTEGER_VAL;
+
+for ::= FOR LEFT_PARENTHESIS for_initialization SEMICOLON expression SEMICOLON unary_operation RIGHT_PARENTHESIS LEFT_BRACE code_block RIGHT_BRACE;
+
 while ::= WHILE LEFT_PARENTHESIS expression RIGHT_PARENTHESIS LEFT_BRACE code_block RIGHT_BRACE;
 
-single_case ::= CASE expression COLON code_block break;
-cases ::= single_case | single_case cases | cases DEFAULT COLON code_block;
-switch ::= SWITCH LEFT_PARENTHESIS expression RIGHT_PARENTHESIS 
-LEFT_BRACE cases RIGHT_BRACE;
+single_case ::= CASE expression COLON code_block BREAK SEMICOLON;
 
-main ::= MAIN LEFT_PARENTHESIS RIGHT_PARENTHESIS LEFT_BRACE code_block RIGHT_BRACE;
-program ::= program_aux;
-program_aux ::= main;
+cases ::= single_case 
+        | single_case cases;
+
+switch ::= SWITCH LEFT_PARENTHESIS expression RIGHT_PARENTHESIS 
+           LEFT_BRACE cases RIGHT_BRACE 
+        | SWITCH LEFT_PARENTHESIS expression RIGHT_PARENTHESIS 
+           LEFT_BRACE cases DEFAULT COLON code_block BREAK SEMICOLON RIGHT_BRACE;
+
+main ::= MAIN LEFT_PARENTHESIS RIGHT_PARENTHESIS LEFT_BRACE code_block RIGHT_BRACE
+{: System.out.println("Funcion MAIN detectada"); :};
+
+array_declaration ::= INTEGER LEFT_BRACKET RIGHT_BRACKET ID ASSIGNMENT LEFT_BRACE array_values_int RIGHT_BRACE SEMICOLON {: System.out.println("Declaracion detectada: Array Int"); :}
+                    | CHAR LEFT_BRACKET RIGHT_BRACKET ID ASSIGNMENT LEFT_BRACE array_values_char RIGHT_BRACE SEMICOLON {: System.out.println("Declaracion detectada: Array Char"); :};
+
+array_values_int ::=  INTEGER_VAL | INTEGER_VAL COMMA array_values_int;
+array_values_char ::= CHAR_VAL | CHAR_VAL COMMA array_values_char;
+
+array_access ::= ID LEFT_BRACKET INTEGER_VAL RIGHT_BRACKET {: System.out.println("Se acceso a un array"); :};
+
+program ::= function_declaration program 
+         | main 
+         {: System.out.println("Programa detectado: Funciones y MAIN"); :};

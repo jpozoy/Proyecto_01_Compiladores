@@ -27,10 +27,10 @@ ID =_\D[a-zA-Z0-9_]+_
 FLOAT=[+-]?([0-9]*[.])?[0-9]+
 BOOL=true|false
 CHAR='(.){1}'
-STRING="(.)+"
+STRING=\"([^\"]*)\"
 
 SPACE=[ \t\r\n]+
-MULTILINE_COMMENT=\_([^]|\n)*_\/
+MULTILINE_COMMENT=\_([^_]|_[^\/])*_\/
 ONELINE_COMMENT=\#.*
 
 %%
@@ -57,8 +57,8 @@ ONELINE_COMMENT=\#.*
 "abreempaque" {return symbol(sym.LEFT_BRACKET, "abreempaque");}
 "cierraempaque" {return symbol(sym.RIGHT_BRACKET, "cierraempaque");}
 
-"abrecuento" {return symbol(sym.LEFT_SQUARE_BRACE, "abrecuento");}
-"cierracuento" {return symbol(sym.RIGHT_SQUARE_BRACE, "cierracuento");}
+"abrecuento" {return symbol(sym.LEFT_BRACE, "abrecuento");}
+"cierracuento" {return symbol(sym.RIGHT_BRACE, "cierracuento");}
 
 "entrega" {return symbol(sym.ASSIGNMENT, "entrega");}
 
@@ -100,7 +100,7 @@ ONELINE_COMMENT=\#.*
 "sigue" {return symbol(sym.COLON, "sigue");}
 
 "narra" {return symbol(sym.PRINT, "narra");}
-"read" {return symbol(sym.INPUT, "read");}
+"escucha" {return symbol(sym.INPUT, "read");}
 
 "_verano_" {return symbol(sym.MAIN, "_verano_");}
 

@@ -7,9 +7,7 @@ package proyecto1;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
-import java_cup.runtime.Symbol.*;
-import java_cup.internal_error;
-import java_cup.runtime.Symbol;
+import java_cup.runtime.*;
 import jflex.exceptions.SilentExit;
 import proyecto1.Lexer;
 import proyecto1.sym;
@@ -22,9 +20,8 @@ import java.util.Scanner;
 
 
 public class Proyecto1 {
-
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
+    public static void menu(){
+                Scanner scanner = new Scanner(System.in);
         boolean continuar = true;
 
         while (continuar) {
@@ -93,6 +90,23 @@ public class Proyecto1 {
 
         scanner.close();
     }
+    public static void main(String[] args) throws FileNotFoundException {
+        generarArchivos();
+                // Crea una instancia de tu lexer con el input a analizar
+        Reader file = new FileReader("src/proyecto1/test.txt");
+        Lexer lexer = new Lexer(file);
+        // Crea el parser
+        parser parser = new parser(lexer);
+
+        // Ejecuta el análisis sintáctico
+        try {
+            parser.parse();
+            System.out.println("----------------------------");
+            System.out.println("Analisis sintactico exitoso");
+        } catch (Exception e) {
+            System.out.println("Error en el análisis sintáctico: " + e.getMessage());
+        }
+    }
 
     public static void generarLexer(String path) throws Exception {
         String[] arr = {path};
@@ -110,12 +124,12 @@ public class Proyecto1 {
             throw new FileNotFoundException("El archivo CUP no existe: " + path);
         }
         // Opciones para java_cup con la ruta del directorio de salida
-        String[] arr = {"-parser", "parser", "-symbols", "sym", "-destdir", outputDir, path};
+        String[] arr = {"-parser", "parser", "-symbols", "sym", "-destdir", outputDir , path};
         java_cup.Main.main(arr);
 
         System.out.println("Parser y símbolos generados correctamente en: " + outputDir);
     } catch (FileNotFoundException e) {
-        System.err.println("Error: " + e.getMessage());
+        System.err.println("Error al generar CUP: " + e.getMessage());
     } catch (Exception e) {
         System.err.println("Error al generar CUP: " + e.getMessage());
         }
@@ -149,5 +163,24 @@ public class Proyecto1 {
                 System.err.println("Error al eliminar archivo: " + archivo + " - " + e.getMessage());
             }
         }
+    }
+    public static void generarArchivos() {
+        try{
+            //generarLexer("src/proyecto1/scanner.flex");
+            
+        }
+        catch (Exception e) {
+           System.out.println("LEXER");
+           e.printStackTrace();
+        }
+        try{
+            generarCup("src/proyecto1/cup.cup");
+            
+        }
+        catch (Exception e) {
+           System.out.println("CUP");
+           e.printStackTrace();
+        }
+        
     }
 }

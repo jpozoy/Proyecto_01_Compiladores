@@ -9,10 +9,10 @@ package proyecto1;
 public class sym {
   /* terminals */
   public static final int NOT_EQUAL_TO = 27;
+  public static final int RIGHT_BRACKET = 10;
   public static final int INCREMENT = 20;
   public static final int CHAR = 4;
-  public static final int ASSIGNMENT = 9;
-  public static final int RIGHT_SQUARE_BRACKET = 13;
+  public static final int ASSIGNMENT = 11;
   public static final int INPUT = 43;
   public static final int CASE = 38;
   public static final int INTEGER = 2;
@@ -29,7 +29,7 @@ public class sym {
   public static final int BOOL_VAL = 48;
   public static final int LEFT_BRACE = 7;
   public static final int DIV = 17;
-  public static final int RIGHT_PARENTHESIS = 11;
+  public static final int RIGHT_PARENTHESIS = 13;
   public static final int MAIN = 44;
   public static final int IF = 33;
   public static final int ID = 45;
@@ -38,7 +38,6 @@ public class sym {
   public static final int BOOLEAN = 3;
   public static final int RETURN = 41;
   public static final int LESS_OR_EQUAL_THAN = 23;
-  public static final int LEFT_SQUARE_BRACKET = 12;
   public static final int error = 1;
   public static final int MUL = 16;
   public static final int FLOAT_VAL = 47;
@@ -57,9 +56,10 @@ public class sym {
   public static final int FLOAT = 6;
   public static final int STRING = 5;
   public static final int LESS_THAN = 22;
+  public static final int LEFT_BRACKET = 9;
   public static final int SUB = 15;
   public static final int PRINT = 42;
-  public static final int LEFT_PARENTHESIS = 10;
+  public static final int LEFT_PARENTHESIS = 12;
   public static final String[] terminalNames = new String[] {
   "EOF",
   "error",
@@ -70,11 +70,11 @@ public class sym {
   "FLOAT",
   "LEFT_BRACE",
   "RIGHT_BRACE",
+  "LEFT_BRACKET",
+  "RIGHT_BRACKET",
   "ASSIGNMENT",
   "LEFT_PARENTHESIS",
   "RIGHT_PARENTHESIS",
-  "LEFT_SQUARE_BRACKET",
-  "RIGHT_SQUARE_BRACKET",
   "ADD",
   "SUB",
   "MUL",
