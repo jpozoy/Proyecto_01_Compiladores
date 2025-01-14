@@ -5,6 +5,7 @@ import java_cup.runtime.*;
 // Código del parser
 parser code{:
     Lexer lexer;
+    TablaSimbolos tablaSimbolos = new TablaSimbolos();
     @SuppressWarnings("deprecation")
     public parser(Lexer lexer){
         this.lexer = lexer; 

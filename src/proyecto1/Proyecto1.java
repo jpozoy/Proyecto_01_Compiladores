@@ -166,7 +166,7 @@ public class Proyecto1 {
     }
     public static void generarArchivos() {
         try{
-            //generarLexer("src/proyecto1/scanner.flex");
+            generarLexer("src/proyecto1/scanner.flex");
             
         }
         catch (Exception e) {
