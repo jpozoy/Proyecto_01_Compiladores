@@ -2,10 +2,12 @@ package proyecto1;
 import proyecto1.Lexer;
 import java_cup.runtime.*;
 
+// Clase para gestionar tabla de símbolos
+
+
 // Código del parser
 parser code{:
     Lexer lexer;
-    TablaSimbolos tablaSimbolos = new TablaSimbolos();
     @SuppressWarnings("deprecation")
     public parser(Lexer lexer){
         this.lexer = lexer; 
@@ -19,6 +21,7 @@ parser code{:
             + current_token.right, null
         );
     }
+    TablaSimbolos tablaSimbolos = new TablaSimbolos();
 
 :}
 
@@ -65,13 +68,13 @@ precedence right LEFT_PARENTHESIS;
 
 start with program;
 
-type ::= INTEGER
-       | BOOLEAN 
-       | CHAR 
-       | STRING
-       | FLOAT;
+type ::= INTEGER:tipo {:RESULT = "entero"; :} // Cargar tipos unicamente
+       | BOOLEAN:tipo {:RESULT = "booleano"; :}
+       | CHAR:tipo {:RESULT = "char"; :}
+       | STRING:tipo {:RESULT = "string"; :}
+       | FLOAT:tipo {:RESULT = "flotante"; :};
 
-type_declaration ::= type ID;
+type_declaration ::= type:typeVar ID:idVar {:RESULT=typeVar;System.out.println("---Tipo: " + typeVar.toString()+ ", Lexema: " + idVar.toString());:};
 
 literal ::= ID
          | INTEGER_VAL 
@@ -134,15 +137,16 @@ code_block ::= statement
              | statement code_block
              | expression code_block;
 
-declaration ::= variable_declaration {: System.out.println("Declaracion detectada: Variable"); :}
-              | function_declaration {: System.out.println("Declaracion detectada: Función"); :};
+declaration ::= variable_declaration:type {: System.out.println("Declaracion detectada: Variable: "+ type.toString());  :} //Crear entrada de variable
+              | function_declaration {: System.out.println("Declaracion detectada: Función"); :}; 
 
-variable_declaration ::= type_declaration SEMICOLON
-                        | type_declaration ASSIGNMENT expression SEMICOLON;
+variable_declaration ::= type_declaration:tipe SEMICOLON {:RESULT=tipe;:}
+                        | type_declaration:tipe ASSIGNMENT expression SEMICOLON {:RESULT=tipe;:};
 
+//Crear entrada de función
 function_declaration ::= type_declaration LEFT_PARENTHESIS parameters RIGHT_PARENTHESIS LEFT_BRACE code_block RIGHT_BRACE;
 
-parameters ::= type_declaration
+parameters ::= type_declaration //Entrada de parametros
              | type_declaration COMMA parameters;
 
 arguments ::= expression 

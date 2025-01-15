@@ -19,7 +19,7 @@ public class Simbolos {
     int column;   // Columna de declaración
     boolean isFunction; // Indica si es función
     String returnType;  // Tipo de retorno (si es función)
-    List<Symbol> parameters; // Argumentos y sus tipos (si es función)
+    List<Simbolos> parameters; // Argumentos y sus tipos (si es función)
 
     public Simbolos(String name, String type, int line, int column) {
         this.name = name;
@@ -31,7 +31,7 @@ public class Simbolos {
         this.parameters = new ArrayList<>();
     }
 
-    public void setFunction(String returnType, List<Symbol> parameters) {
+    public void setFunction(String returnType, List<Simbolos> parameters) {
         this.isFunction = true;
         this.returnType = returnType;
         this.parameters = parameters;

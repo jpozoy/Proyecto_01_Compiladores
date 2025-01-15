@@ -681,6 +681,7 @@ public class parser extends java_cup.runtime.lr_parser {
             + current_token.right, null
         );
     }
+    TablaSimbolos tablaSimbolos = new TablaSimbolos();
 
 
 
@@ -726,7 +727,10 @@ class CUP$parser$actions {
           case 1: // type ::= INTEGER 
             {
               Object RESULT =null;
-
+		int tipoleft = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
+		int tiporight = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
+		Object tipo = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
+		RESULT = "entero"; 
               CUP$parser$result = parser.getSymbolFactory().newSymbol("type",24, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -735,7 +739,10 @@ class CUP$parser$actions {
           case 2: // type ::= BOOLEAN 
             {
               Object RESULT =null;
-
+		int tipoleft = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
+		int tiporight = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
+		Object tipo = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
+		RESULT = "booleano"; 
               CUP$parser$result = parser.getSymbolFactory().newSymbol("type",24, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -744,7 +751,10 @@ class CUP$parser$actions {
           case 3: // type ::= CHAR 
             {
               Object RESULT =null;
-
+		int tipoleft = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
+		int tiporight = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
+		Object tipo = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
+		RESULT = "char"; 
               CUP$parser$result = parser.getSymbolFactory().newSymbol("type",24, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -753,7 +763,10 @@ class CUP$parser$actions {
           case 4: // type ::= STRING 
             {
               Object RESULT =null;
-
+		int tipoleft = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
+		int tiporight = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
+		Object tipo = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
+		RESULT = "string"; 
               CUP$parser$result = parser.getSymbolFactory().newSymbol("type",24, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -762,7 +775,10 @@ class CUP$parser$actions {
           case 5: // type ::= FLOAT 
             {
               Object RESULT =null;
-
+		int tipoleft = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
+		int tiporight = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
+		Object tipo = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
+		RESULT = "flotante"; 
               CUP$parser$result = parser.getSymbolFactory().newSymbol("type",24, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -771,7 +787,13 @@ class CUP$parser$actions {
           case 6: // type_declaration ::= type ID 
             {
               Object RESULT =null;
-
+		int typeVarleft = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)).left;
+		int typeVarright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)).right;
+		Object typeVar = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-1)).value;
+		int idVarleft = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
+		int idVarright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
+		Object idVar = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
+		RESULT=typeVar;System.out.println("---Tipo: " + typeVar.toString()+ ", Lexema: " + idVar.toString());
               CUP$parser$result = parser.getSymbolFactory().newSymbol("type_declaration",25, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1275,7 +1297,10 @@ class CUP$parser$actions {
           case 62: // declaration ::= variable_declaration 
             {
               Object RESULT =null;
-		 System.out.println("Declaracion detectada: Variable"); 
+		int typeleft = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
+		int typeright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
+		Object type = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
+		 System.out.println("Declaracion detectada: Variable: "+ type.toString());  
               CUP$parser$result = parser.getSymbolFactory().newSymbol("declaration",26, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1293,7 +1318,10 @@ class CUP$parser$actions {
           case 64: // variable_declaration ::= type_declaration SEMICOLON 
             {
               Object RESULT =null;
-
+		int tipeleft = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)).left;
+		int tiperight = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)).right;
+		Object tipe = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-1)).value;
+		RESULT=tipe;
               CUP$parser$result = parser.getSymbolFactory().newSymbol("variable_declaration",27, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1302,7 +1330,10 @@ class CUP$parser$actions {
           case 65: // variable_declaration ::= type_declaration ASSIGNMENT expression SEMICOLON 
             {
               Object RESULT =null;
-
+		int tipeleft = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-3)).left;
+		int tiperight = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-3)).right;
+		Object tipe = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-3)).value;
+		RESULT=tipe;
               CUP$parser$result = parser.getSymbolFactory().newSymbol("variable_declaration",27, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-3)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
