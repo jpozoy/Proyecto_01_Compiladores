@@ -1136,7 +1136,7 @@ class CUP$parser$actions {
           case 44: // statement ::= for 
             {
               Object RESULT =null;
-		 System.out.println("Stmt detectado: For"); 
+		
               CUP$parser$result = parser.getSymbolFactory().newSymbol("statement",18, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1145,7 +1145,7 @@ class CUP$parser$actions {
           case 45: // statement ::= while 
             {
               Object RESULT =null;
-		 System.out.println("Stmt detectado: While"); 
+
               CUP$parser$result = parser.getSymbolFactory().newSymbol("statement",18, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1154,7 +1154,7 @@ class CUP$parser$actions {
           case 46: // statement ::= if 
             {
               Object RESULT =null;
-		 System.out.println("Stmt detectado: If"); 
+
               CUP$parser$result = parser.getSymbolFactory().newSymbol("statement",18, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1163,7 +1163,7 @@ class CUP$parser$actions {
           case 47: // statement ::= else 
             {
               Object RESULT =null;
-		 System.out.println("Stmt detectado: Else"); 
+
               CUP$parser$result = parser.getSymbolFactory().newSymbol("statement",18, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1172,7 +1172,7 @@ class CUP$parser$actions {
           case 48: // statement ::= switch 
             {
               Object RESULT =null;
-		 System.out.println("Stmt detectado: Switch"); 
+
               CUP$parser$result = parser.getSymbolFactory().newSymbol("statement",18, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1190,7 +1190,7 @@ class CUP$parser$actions {
           case 50: // statement ::= read 
             {
               Object RESULT =null;
-		 System.out.println("Stmt detectado: Read"); 
+
               CUP$parser$result = parser.getSymbolFactory().newSymbol("statement",18, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1199,7 +1199,7 @@ class CUP$parser$actions {
           case 51: // statement ::= print 
             {
               Object RESULT =null;
-		 System.out.println("Stmt detectado: Print"); 
+
               CUP$parser$result = parser.getSymbolFactory().newSymbol("statement",18, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1208,7 +1208,7 @@ class CUP$parser$actions {
           case 52: // statement ::= return 
             {
               Object RESULT =null;
-		 System.out.println("Stmt detectado: Return"); 
+
               CUP$parser$result = parser.getSymbolFactory().newSymbol("statement",18, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1217,7 +1217,7 @@ class CUP$parser$actions {
           case 53: // statement ::= function_call SEMICOLON 
             {
               Object RESULT =null;
-		 System.out.println("Stmt detectado: Function Call"); 
+
               CUP$parser$result = parser.getSymbolFactory().newSymbol("statement",18, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1226,7 +1226,7 @@ class CUP$parser$actions {
           case 54: // statement ::= NOT expression SEMICOLON 
             {
               Object RESULT =null;
-		 System.out.println("Stmt detectado: NOT"); 
+
               CUP$parser$result = parser.getSymbolFactory().newSymbol("statement",18, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1235,7 +1235,7 @@ class CUP$parser$actions {
           case 55: // statement ::= unary_operation SEMICOLON 
             {
               Object RESULT =null;
-		 System.out.println("Stmt detectado: Operacion unaria"); 
+
               CUP$parser$result = parser.getSymbolFactory().newSymbol("statement",18, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1310,7 +1310,10 @@ class CUP$parser$actions {
           case 63: // declaration ::= function_declaration 
             {
               Object RESULT =null;
-		 System.out.println("Declaracion detectada: Función"); 
+		int typeleft = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
+		int typeright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
+		Object type = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
+		 System.out.println("--Declaracion detectada: Función"); 
               CUP$parser$result = parser.getSymbolFactory().newSymbol("declaration",26, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1340,7 +1343,8 @@ class CUP$parser$actions {
 		int idVarleft = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-3)).left;
 		int idVarright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-3)).right;
 		Object idVar = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-3)).value;
-		RESULT=typeVar; System.out.println("Declaracion Variable: "+ typeVar.toString() + idVarleft + idVarright);
+		RESULT=typeVar;
+                          System.out.println("Variable"+idVar.toString());
                           Simbolos simbolo = new Simbolos(idVar.toString(),typeVar.toString(),idVarleft,idVarright);
                           tablaSimbolos.agregarSimbolo(simbolo);
               CUP$parser$result = parser.getSymbolFactory().newSymbol("variable_declaration",27, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-4)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
@@ -1358,10 +1362,13 @@ class CUP$parser$actions {
 		int idVarright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-6)).right;
 		Object idVar = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-6)).value;
 		
+                            System.out.println("Funcion"+idVar.toString());
                             Simbolos simbolo = new Simbolos(idVar.toString(),typeVar.toString(),idVarleft,idVarright);
+                            simbolo.setFunction(typeVar.toString(), tablaSimbolos.getParametrosEnEspera());
+                            tablaSimbolos.limpiarParametrosEnEspera();
                             tablaSimbolos.agregarSimbolo(simbolo);
                             tablaSimbolos.abrirScope();
-                            tablaSimbolos.cerrarScope();
+                            tablaSimbolos.cerrarScope(); // Cerrar el scope de la función
                         
               CUP$parser$result = parser.getSymbolFactory().newSymbol("function_declaration",28, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-7)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
@@ -1379,7 +1386,8 @@ class CUP$parser$actions {
 		Object idVar = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
 		
                 Simbolos simbolo = new Simbolos(idVar.toString(),typeVar.toString(),idVarleft,idVarright);
-                tablaSimbolos.agregarSimbolo(simbolo);
+                tablaSimbolos.agregarParametroEnEspera(simbolo);
+                System.out.println("Se proceso un parametro");
             
               CUP$parser$result = parser.getSymbolFactory().newSymbol("parameters",30, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
@@ -1397,7 +1405,8 @@ class CUP$parser$actions {
 		Object idVar = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-2)).value;
 		
                 Simbolos simbolo = new Simbolos(idVar.toString(),typeVar.toString(),idVarleft,idVarright);
-                tablaSimbolos.agregarSimbolo(simbolo);
+                tablaSimbolos.agregarParametroEnEspera(simbolo);
+                System.out.println("Se proceso otro parametro");
             
               CUP$parser$result = parser.getSymbolFactory().newSymbol("parameters",30, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-3)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
@@ -1581,7 +1590,7 @@ class CUP$parser$actions {
           case 87: // array_declaration ::= INTEGER LEFT_BRACKET RIGHT_BRACKET ID ASSIGNMENT LEFT_BRACE array_values_int RIGHT_BRACE SEMICOLON 
             {
               Object RESULT =null;
-		 System.out.println("Declaracion detectada: Array Int"); 
+
               CUP$parser$result = parser.getSymbolFactory().newSymbol("array_declaration",32, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-8)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1590,7 +1599,7 @@ class CUP$parser$actions {
           case 88: // array_declaration ::= CHAR LEFT_BRACKET RIGHT_BRACKET ID ASSIGNMENT LEFT_BRACE array_values_char RIGHT_BRACE SEMICOLON 
             {
               Object RESULT =null;
-		 System.out.println("Declaracion detectada: Array Char"); 
+
               CUP$parser$result = parser.getSymbolFactory().newSymbol("array_declaration",32, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-8)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1635,7 +1644,7 @@ class CUP$parser$actions {
           case 93: // array_access ::= ID LEFT_BRACKET INTEGER_VAL RIGHT_BRACKET 
             {
               Object RESULT =null;
-		 System.out.println("Se acceso a un array"); 
+
               CUP$parser$result = parser.getSymbolFactory().newSymbol("array_access",33, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-3)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;

@@ -117,18 +117,18 @@ logic_expression ::= expression AND expression
 
 function_call ::= ID LEFT_PARENTHESIS arguments RIGHT_PARENTHESIS;
 
-statement ::= for {: System.out.println("Stmt detectado: For"); :}
-            | while {: System.out.println("Stmt detectado: While"); :}
-            | if {: System.out.println("Stmt detectado: If"); :}
-            | else {: System.out.println("Stmt detectado: Else"); :}
-            | switch {: System.out.println("Stmt detectado: Switch"); :}
+statement ::= for {::}//{: System.out.println("Stmt detectado: For"); :}
+            | while //{: System.out.println("Stmt detectado: While"); :}
+            | if //{: System.out.println("Stmt detectado: If"); :}
+            | else //{: System.out.println("Stmt detectado: Else"); :}
+            | switch //{: System.out.println("Stmt detectado: Switch"); :}
             | declaration
-            | read {: System.out.println("Stmt detectado: Read"); :}
-            | print {: System.out.println("Stmt detectado: Print"); :}
-            | return {: System.out.println("Stmt detectado: Return"); :}
-            | function_call SEMICOLON {: System.out.println("Stmt detectado: Function Call"); :}
-            | NOT expression SEMICOLON {: System.out.println("Stmt detectado: NOT"); :}
-            | unary_operation SEMICOLON {: System.out.println("Stmt detectado: Operacion unaria"); :}
+            | read //{: System.out.println("Stmt detectado: Read"); :}
+            | print //{: System.out.println("Stmt detectado: Print"); :}
+            | return //{: System.out.println("Stmt detectado: Return"); :}
+            | function_call SEMICOLON //{: System.out.println("Stmt detectado: Function Call"); :}
+            | NOT expression SEMICOLON //{: System.out.println("Stmt detectado: NOT"); :}
+            | unary_operation SEMICOLON //{: System.out.println("Stmt detectado: Operacion unaria"); :}
             | array_declaration 
             | array_access SEMICOLON;
 
@@ -138,28 +138,34 @@ code_block ::= statement
              | expression code_block;
 
 declaration ::= variable_declaration:type {: System.out.println("Declaracion detectada: Variable: "+ type.toString());  :} //Crear entrada de variable
-              | function_declaration {: System.out.println("Declaracion detectada: Función"); :}; 
+              | function_declaration:type {: System.out.println("--Declaracion detectada: Función"); :}; 
 
 variable_declaration ::= type:typeVar ID:idVar SEMICOLON {:RESULT=typeVar;:}
-                        | type:typeVar ID:idVar ASSIGNMENT expression SEMICOLON {:RESULT=typeVar; System.out.println("Declaracion Variable: "+ typeVar.toString() + idVarleft + idVarright);
+                        | type:typeVar ID:idVar ASSIGNMENT expression SEMICOLON {:RESULT=typeVar;
+                          System.out.println("Variable"+idVar.toString());
                           Simbolos simbolo = new Simbolos(idVar.toString(),typeVar.toString(),idVarleft,idVarright);
                           tablaSimbolos.agregarSimbolo(simbolo);:};
 
 //Crear entrada de función
 function_declaration ::= type:typeVar ID:idVar LEFT_PARENTHESIS parameters RIGHT_PARENTHESIS LEFT_BRACE code_block RIGHT_BRACE {:
+                            System.out.println("Funcion"+idVar.toString());
                             Simbolos simbolo = new Simbolos(idVar.toString(),typeVar.toString(),idVarleft,idVarright);
+                            simbolo.setFunction(typeVar.toString(), tablaSimbolos.getParametrosEnEspera());
+                            tablaSimbolos.limpiarParametrosEnEspera();
                             tablaSimbolos.agregarSimbolo(simbolo);
                             tablaSimbolos.abrirScope();
-                            tablaSimbolos.cerrarScope();
+                            tablaSimbolos.cerrarScope(); // Cerrar el scope de la función
                         :};
 
 parameters ::= type:typeVar ID:idVar {:
                 Simbolos simbolo = new Simbolos(idVar.toString(),typeVar.toString(),idVarleft,idVarright);
-                tablaSimbolos.agregarSimbolo(simbolo);
+                tablaSimbolos.agregarParametroEnEspera(simbolo);
+                System.out.println("Se proceso un parametro");
             :}//Entrada de parametros
              | type:typeVar ID:idVar COMMA parameters{:
                 Simbolos simbolo = new Simbolos(idVar.toString(),typeVar.toString(),idVarleft,idVarright);
-                tablaSimbolos.agregarSimbolo(simbolo);
+                tablaSimbolos.agregarParametroEnEspera(simbolo);
+                System.out.println("Se proceso otro parametro");
             :};
 
 arguments ::= expression 
@@ -195,13 +201,13 @@ switch ::= SWITCH LEFT_PARENTHESIS expression RIGHT_PARENTHESIS
 main ::= MAIN LEFT_PARENTHESIS RIGHT_PARENTHESIS LEFT_BRACE code_block RIGHT_BRACE
 {: System.out.println("Funcion MAIN detectada"); :};
 
-array_declaration ::= INTEGER LEFT_BRACKET RIGHT_BRACKET ID ASSIGNMENT LEFT_BRACE array_values_int RIGHT_BRACE SEMICOLON {: System.out.println("Declaracion detectada: Array Int"); :}
-                    | CHAR LEFT_BRACKET RIGHT_BRACKET ID ASSIGNMENT LEFT_BRACE array_values_char RIGHT_BRACE SEMICOLON {: System.out.println("Declaracion detectada: Array Char"); :};
+array_declaration ::= INTEGER LEFT_BRACKET RIGHT_BRACKET ID ASSIGNMENT LEFT_BRACE array_values_int RIGHT_BRACE SEMICOLON //{: System.out.println("Declaracion detectada: Array Int"); :}
+                    | CHAR LEFT_BRACKET RIGHT_BRACKET ID ASSIGNMENT LEFT_BRACE array_values_char RIGHT_BRACE SEMICOLON ;//{: System.out.println("Declaracion detectada: Array Char"); :};
 
 array_values_int ::=  INTEGER_VAL | INTEGER_VAL COMMA array_values_int;
 array_values_char ::= CHAR_VAL | CHAR_VAL COMMA array_values_char;
 
-array_access ::= ID LEFT_BRACKET INTEGER_VAL RIGHT_BRACKET {: System.out.println("Se acceso a un array"); :};
+array_access ::= ID LEFT_BRACKET INTEGER_VAL RIGHT_BRACKET ;//{: System.out.println("Se acceso a un array"); :};
 
 program ::= function_declaration program 
          | main 

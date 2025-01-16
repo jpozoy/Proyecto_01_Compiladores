@@ -4,7 +4,9 @@
  */
 package proyecto1;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
@@ -14,6 +16,7 @@ import java.util.Stack;
  */
 public class TablaSimbolos {
     Stack<Map<String, Simbolos>> scopes = new Stack<>();
+    private List<Simbolos> parametrosEnEspera = new ArrayList<>();
     
     
     public TablaSimbolos() {
@@ -23,12 +26,14 @@ public class TablaSimbolos {
     // Abrir un nuevo scope
     public void abrirScope() {
         scopes.push(new HashMap<>());
+        System.out.println("Se abrio un scope");
     }
 
     // Cerrar el scope actual
     public void cerrarScope() {
         if (scopes.size() > 1) { // Evitar cerrar el scope global
             scopes.pop();
+            System.out.println("Se cerro un scope");
         }
     }
 
@@ -42,6 +47,7 @@ public class TablaSimbolos {
             return false; // Símbolo ya declarado en este scope
         }
         scopeActual.put(simbolo.name, simbolo);
+        //System.out.println(simbolo.name);
         return true;
     }
 
@@ -63,5 +69,18 @@ public class TablaSimbolos {
                 System.out.println(simbolo);
             }
         }
+    }
+    //Gestión de asociación de parametros
+    public void agregarParametroEnEspera(Simbolos parametro) {
+    System.out.println("Se proceso un parametro en espera:");
+    parametrosEnEspera.add(parametro);
+    }
+
+    public List<Simbolos> getParametrosEnEspera() {
+        return new ArrayList<>(parametrosEnEspera);
+    }
+
+    public void limpiarParametrosEnEspera() {
+        parametrosEnEspera.clear();
     }
 }
