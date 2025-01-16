@@ -2,8 +2,6 @@ package proyecto1;
 import proyecto1.Lexer;
 import java_cup.runtime.*;
 
-// Clase para gestionar tabla de símbolos
-
 
 // Código del parser
 parser code{:
@@ -21,7 +19,9 @@ parser code{:
             + current_token.right, null
         );
     }
+    //Inicialización de la tabla de simbolos
     TablaSimbolos tablaSimbolos = new TablaSimbolos();
+    
 
 :}
 
@@ -140,14 +140,27 @@ code_block ::= statement
 declaration ::= variable_declaration:type {: System.out.println("Declaracion detectada: Variable: "+ type.toString());  :} //Crear entrada de variable
               | function_declaration {: System.out.println("Declaracion detectada: Función"); :}; 
 
-variable_declaration ::= type_declaration:tipe SEMICOLON {:RESULT=tipe;:}
-                        | type_declaration:tipe ASSIGNMENT expression SEMICOLON {:RESULT=tipe;:};
+variable_declaration ::= type:typeVar ID:idVar SEMICOLON {:RESULT=typeVar;:}
+                        | type:typeVar ID:idVar ASSIGNMENT expression SEMICOLON {:RESULT=typeVar; System.out.println("Declaracion Variable: "+ typeVar.toString() + idVarleft + idVarright);
+                          Simbolos simbolo = new Simbolos(idVar.toString(),typeVar.toString(),idVarleft,idVarright);
+                          tablaSimbolos.agregarSimbolo(simbolo);:};
 
 //Crear entrada de función
-function_declaration ::= type_declaration LEFT_PARENTHESIS parameters RIGHT_PARENTHESIS LEFT_BRACE code_block RIGHT_BRACE;
+function_declaration ::= type:typeVar ID:idVar LEFT_PARENTHESIS parameters RIGHT_PARENTHESIS LEFT_BRACE code_block RIGHT_BRACE {:
+                            Simbolos simbolo = new Simbolos(idVar.toString(),typeVar.toString(),idVarleft,idVarright);
+                            tablaSimbolos.agregarSimbolo(simbolo);
+                            tablaSimbolos.abrirScope();
+                            tablaSimbolos.cerrarScope();
+                        :};
 
-parameters ::= type_declaration //Entrada de parametros
-             | type_declaration COMMA parameters;
+parameters ::= type:typeVar ID:idVar {:
+                Simbolos simbolo = new Simbolos(idVar.toString(),typeVar.toString(),idVarleft,idVarright);
+                tablaSimbolos.agregarSimbolo(simbolo);
+            :}//Entrada de parametros
+             | type:typeVar ID:idVar COMMA parameters{:
+                Simbolos simbolo = new Simbolos(idVar.toString(),typeVar.toString(),idVarleft,idVarright);
+                tablaSimbolos.agregarSimbolo(simbolo);
+            :};
 
 arguments ::= expression 
             | expression COMMA arguments ;
@@ -162,8 +175,8 @@ print ::= PRINT LEFT_PARENTHESIS expression RIGHT_PARENTHESIS SEMICOLON;
 if ::= IF LEFT_PARENTHESIS expression RIGHT_PARENTHESIS LEFT_BRACE code_block RIGHT_BRACE
     | IF LEFT_PARENTHESIS expression RIGHT_PARENTHESIS LEFT_BRACE code_block RIGHT_BRACE ELSE LEFT_BRACE code_block RIGHT_BRACE;
 
-for_initialization ::= type_declaration 
-                     | type_declaration ASSIGNMENT INTEGER_VAL;
+for_initialization ::= type:typeVar ID:idVar 
+                     | type:typeVar ID:idVar ASSIGNMENT INTEGER_VAL;
 
 for ::= FOR LEFT_PARENTHESIS for_initialization SEMICOLON expression SEMICOLON unary_operation RIGHT_PARENTHESIS LEFT_BRACE code_block RIGHT_BRACE;
 

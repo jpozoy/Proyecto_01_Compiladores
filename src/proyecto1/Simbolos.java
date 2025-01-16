@@ -35,5 +35,15 @@ public class Simbolos {
         this.isFunction = true;
         this.returnType = returnType;
         this.parameters = parameters;
-    }    
+    }
+    @Override
+    public String toString() {
+        if (isFunction) {
+            return String.format("Funcion: %s, Tipo Retorno: %s, Parametros: %s, Linea: %d, Columna: %d", 
+                name, returnType, parameters, line, column);
+        } else {
+            return String.format("Variable: %s, Tipo: %s, Linea: %d, Columna: %d", 
+                name, type, line, column);
+        }
+    }
 }

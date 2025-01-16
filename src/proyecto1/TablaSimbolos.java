@@ -14,7 +14,12 @@ import java.util.Stack;
  */
 public class TablaSimbolos {
     Stack<Map<String, Simbolos>> scopes = new Stack<>();
-
+    
+    
+    public TablaSimbolos() {
+        // Crear un scope global al inicializar
+        abrirScope();
+    }
     // Abrir un nuevo scope
     public void abrirScope() {
         scopes.push(new HashMap<>());
@@ -22,7 +27,7 @@ public class TablaSimbolos {
 
     // Cerrar el scope actual
     public void cerrarScope() {
-        if (!scopes.isEmpty()) {
+        if (scopes.size() > 1) { // Evitar cerrar el scope global
             scopes.pop();
         }
     }
@@ -49,5 +54,14 @@ public class TablaSimbolos {
             }
         }
         return null; // No encontrado
+    }
+    //Imprimir la tabla de simbolos
+    public void imprimirTabla() {
+        System.out.println("Tabla de Simbolos:");
+        for (Map<String, Simbolos> scope : scopes) {
+            for (Simbolos simbolo : scope.values()) {
+                System.out.println(simbolo);
+            }
+        }
     }
 }
