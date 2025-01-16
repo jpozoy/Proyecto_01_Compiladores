@@ -26,16 +26,22 @@ public class TablaSimbolos {
     // Abrir un nuevo scope
     public void abrirScope() {
         scopes.push(new HashMap<>());
-        System.out.println("Se abrio un scope");
+        //System.out.println("Se abrio un scope");
     }
 
     // Cerrar el scope actual
     public void cerrarScope() {
         if (scopes.size() > 1) { // Evitar cerrar el scope global
+            // Obtener el scope actual antes de cerrarlo
+            Map<String, Simbolos> scopeActual = scopes.peek();
+            // Imprimir los símbolos del scope actual
+            imprimirScope(scopeActual,"Local");
+            // Remover el scope actual de la pila
             scopes.pop();
-            System.out.println("Se cerro un scope");
-        }
+        } else {
+            System.out.println("No se puede cerrar el scope global.");
     }
+}
 
     // Agregar símbolo al scope actual
     public boolean agregarSimbolo(Simbolos simbolo) {
@@ -47,7 +53,6 @@ public class TablaSimbolos {
             return false; // Símbolo ya declarado en este scope
         }
         scopeActual.put(simbolo.name, simbolo);
-        //System.out.println(simbolo.name);
         return true;
     }
 
@@ -70,10 +75,24 @@ public class TablaSimbolos {
             }
         }
     }
+    // Método para imprimir un scope específico
+    public void imprimirScope(Map<String, Simbolos> scope, String scopeName) {
+        System.out.println("-------------------------------------");
+        System.out.println("Tabla de simbolos del scope: " + scopeName);
+        for (Simbolos simbolo : scope.values()) {
+            System.out.println(simbolo);
+        }
+        System.out.println("-------------------------------------");
+    }
+    public void imprimirScopeGlobal() {
+        Map<String, Simbolos> scopeActual = scopes.peek();
+        imprimirScope(scopeActual, "Global");
+    };
+    
     //Gestión de asociación de parametros
     public void agregarParametroEnEspera(Simbolos parametro) {
-    System.out.println("Se proceso un parametro en espera:");
-    parametrosEnEspera.add(parametro);
+        //System.out.println("Se proceso un parametro en espera:");
+        parametrosEnEspera.add(parametro);
     }
 
     public List<Simbolos> getParametrosEnEspera() {

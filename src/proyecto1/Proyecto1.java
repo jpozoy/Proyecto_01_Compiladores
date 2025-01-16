@@ -102,10 +102,10 @@ public class Proyecto1 {
         // Ejecuta el análisis sintáctico
         try {
             parser.parse();
-            System.out.println("----------------------------");
-            System.out.println("Analisis sintactico exitoso");
+            //System.out.println("----------------------------");
+            //System.out.println("Analisis sintactico exitoso");
             // Imprimir la tabla de símbolos
-            parser.tablaSimbolos.imprimirTabla();
+            //parser.tablaSimbolos.imprimirTabla();
         } catch (Exception e) {
             System.out.println("Error en el análisis sintáctico: " + e.getMessage());
         }

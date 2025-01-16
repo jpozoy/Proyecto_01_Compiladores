@@ -48,7 +48,7 @@ terminal COMMA;
 // No terminales
 non terminal program, code_block, main;
 non terminal literal, comparator, arithmetic_operator, logical_operator;
-non terminal for, for_initialization, while, if, else, switch, single_case, cases, read, print, return;
+non terminal for, for_initialization, while, if, if_block, else, switch, single_case, cases, read, print, return;
 non terminal statement, expression, arithmetic_expression, relational_expression , logic_expression,unary_operation;
 non terminal type, type_declaration;
 non terminal declaration, variable_declaration, function_declaration;
@@ -74,6 +74,7 @@ type ::= INTEGER:tipo {:RESULT = "entero"; :} // Cargar tipos unicamente
        | STRING:tipo {:RESULT = "string"; :}
        | FLOAT:tipo {:RESULT = "flotante"; :};
 
+//Esto no se esta usando
 type_declaration ::= type:typeVar ID:idVar {:RESULT=typeVar;System.out.println("---Tipo: " + typeVar.toString()+ ", Lexema: " + idVar.toString());:};
 
 literal ::= ID
@@ -118,10 +119,10 @@ logic_expression ::= expression AND expression
 function_call ::= ID LEFT_PARENTHESIS arguments RIGHT_PARENTHESIS;
 
 statement ::= for {::}//{: System.out.println("Stmt detectado: For"); :}
-            | while //{: System.out.println("Stmt detectado: While"); :}
+            | while //{: System.out.println("Stmt detectado: While");:}
             | if //{: System.out.println("Stmt detectado: If"); :}
             | else //{: System.out.println("Stmt detectado: Else"); :}
-            | switch //{: System.out.println("Stmt detectado: Switch"); :}
+            | switch //{: System.out.println("Stmt detectado: Switch");:}
             | declaration
             | read //{: System.out.println("Stmt detectado: Read"); :}
             | print //{: System.out.println("Stmt detectado: Print"); :}
@@ -137,9 +138,10 @@ code_block ::= statement
              | statement code_block
              | expression code_block;
 
-declaration ::= variable_declaration:type {: System.out.println("Declaracion detectada: Variable: "+ type.toString());  :} //Crear entrada de variable
+declaration ::= variable_declaration:type {: System.out.println("Declaracion detectada: Variable: "+ type.toString());  :} 
               | function_declaration:type {: System.out.println("--Declaracion detectada: Función"); :}; 
 
+//Crear entrada de variable
 variable_declaration ::= type:typeVar ID:idVar SEMICOLON {:RESULT=typeVar;:}
                         | type:typeVar ID:idVar ASSIGNMENT expression SEMICOLON {:RESULT=typeVar;
                           System.out.println("Variable"+idVar.toString());
@@ -147,25 +149,24 @@ variable_declaration ::= type:typeVar ID:idVar SEMICOLON {:RESULT=typeVar;:}
                           tablaSimbolos.agregarSimbolo(simbolo);:};
 
 //Crear entrada de función
-function_declaration ::= type:typeVar ID:idVar LEFT_PARENTHESIS parameters RIGHT_PARENTHESIS LEFT_BRACE code_block RIGHT_BRACE {:
-                            System.out.println("Funcion"+idVar.toString());
+function_declaration ::= type:typeVar ID:idVar LEFT_PARENTHESIS parameters RIGHT_PARENTHESIS LEFT_BRACE 
+                        {:
                             Simbolos simbolo = new Simbolos(idVar.toString(),typeVar.toString(),idVarleft,idVarright);
                             simbolo.setFunction(typeVar.toString(), tablaSimbolos.getParametrosEnEspera());
                             tablaSimbolos.limpiarParametrosEnEspera();
                             tablaSimbolos.agregarSimbolo(simbolo);
+                            
                             tablaSimbolos.abrirScope();
-                            tablaSimbolos.cerrarScope(); // Cerrar el scope de la función
-                        :};
+                        :} 
+                        code_block RIGHT_BRACE {:tablaSimbolos.cerrarScope();:};
 
 parameters ::= type:typeVar ID:idVar {:
                 Simbolos simbolo = new Simbolos(idVar.toString(),typeVar.toString(),idVarleft,idVarright);
                 tablaSimbolos.agregarParametroEnEspera(simbolo);
-                System.out.println("Se proceso un parametro");
             :}//Entrada de parametros
              | type:typeVar ID:idVar COMMA parameters{:
                 Simbolos simbolo = new Simbolos(idVar.toString(),typeVar.toString(),idVarleft,idVarright);
                 tablaSimbolos.agregarParametroEnEspera(simbolo);
-                System.out.println("Se proceso otro parametro");
             :};
 
 arguments ::= expression 
@@ -181,12 +182,17 @@ print ::= PRINT LEFT_PARENTHESIS expression RIGHT_PARENTHESIS SEMICOLON;
 if ::= IF LEFT_PARENTHESIS expression RIGHT_PARENTHESIS LEFT_BRACE code_block RIGHT_BRACE
     | IF LEFT_PARENTHESIS expression RIGHT_PARENTHESIS LEFT_BRACE code_block RIGHT_BRACE ELSE LEFT_BRACE code_block RIGHT_BRACE;
 
+if_block ::= LEFT_BRACE 
+             {: tablaSimbolos.abrirScope(); :} 
+             code_block RIGHT_BRACE 
+             {: tablaSimbolos.cerrarScope(); :};
+
 for_initialization ::= type:typeVar ID:idVar 
                      | type:typeVar ID:idVar ASSIGNMENT INTEGER_VAL;
 
-for ::= FOR LEFT_PARENTHESIS for_initialization SEMICOLON expression SEMICOLON unary_operation RIGHT_PARENTHESIS LEFT_BRACE code_block RIGHT_BRACE;
+for ::= FOR LEFT_PARENTHESIS for_initialization SEMICOLON expression SEMICOLON unary_operation RIGHT_PARENTHESIS LEFT_BRACE {:tablaSimbolos.abrirScope();:} code_block RIGHT_BRACE;
 
-while ::= WHILE LEFT_PARENTHESIS expression RIGHT_PARENTHESIS LEFT_BRACE code_block RIGHT_BRACE;
+while ::= WHILE LEFT_PARENTHESIS expression RIGHT_PARENTHESIS LEFT_BRACE {:tablaSimbolos.abrirScope();:} code_block RIGHT_BRACE {:tablaSimbolos.cerrarScope();:};
 
 single_case ::= CASE expression COLON code_block BREAK SEMICOLON;
 
@@ -211,4 +217,4 @@ array_access ::= ID LEFT_BRACKET INTEGER_VAL RIGHT_BRACKET ;//{: System.out.prin
 
 program ::= function_declaration program 
          | main 
-         {: System.out.println("Programa detectado: Funciones y MAIN"); :};
+         {:tablaSimbolos.imprimirScopeGlobal(); :};
