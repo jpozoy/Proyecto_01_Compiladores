@@ -84,9 +84,20 @@ public static void menu() throws FileNotFoundException {
                     System.out.print("Ingresa la ruta del archivo de entrada: ");
                     String rutaEntradaParser = scanner.nextLine();
                     try { 
-                        Reader file = new FileReader("src/proyecto1/test.txt");
+                        Reader file = new FileReader(rutaEntradaParser);
                         Lexer lexer = new Lexer(file);
-                        parse(lexer);
+                        parser parser = new parser(lexer);
+                        try {
+                            parser.parse();
+                        if (parser.syntaxErrors) {
+                            System.err.println("El archivo no puede ser generado por la gramatica.");
+                        } else {
+                            System.out.println("El archivo puede ser generado por la gramatica.");
+                        }
+                    }
+                    catch (Exception e){
+                        e.printStackTrace();
+                    }
                     } catch (FileNotFoundException e) {
                         System.out.println("Error: Archivo no encontrado.");
                     }
