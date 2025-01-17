@@ -123,10 +123,11 @@ statement ::= for {::}//{: System.out.println("Stmt detectado: For"); :}
             | NOT expression SEMICOLON //{: System.out.println("Stmt detectado: NOT"); :}
             | unary_operation SEMICOLON //{: System.out.println("Stmt detectado: Operacion unaria"); :}
             | array_declaration 
-            | array_access SEMICOLON;
+            | array_access SEMICOLON
             | error SEMICOLON;
 
-block ::= LEFT_BRACE {:TablaSimbolos.abrirScope();:} code_block RIGHT_BRACE {:TablaSimbolos.cerrarScope();:};
+block ::= LEFT_BRACE {:TablaSimbolos.abrirScope();:} code_block RIGHT_BRACE {:TablaSimbolos.cerrarScope();:}
+             |error RIGHT_BRACE ;
 code_block ::= statement
              | expression
              | statement code_block
