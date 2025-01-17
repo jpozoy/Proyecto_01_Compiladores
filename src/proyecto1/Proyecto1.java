@@ -95,7 +95,13 @@ public static void menu() throws FileNotFoundException {
                     Lexer lexer = new Lexer(file);
                     parser parser = new parser(lexer);
                     try {
+                        
                         parser.parse();
+                        if (parser.syntaxErrors) {
+                            System.err.println("El archivo no puede ser generado por la gramatica.");
+                        } else {
+                            System.out.println("El archivo puede ser generado por la gramatica.");
+                        }
                     }
                     catch (Exception e){
                         e.printStackTrace();

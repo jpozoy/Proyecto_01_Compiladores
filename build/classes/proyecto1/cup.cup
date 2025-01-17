@@ -14,10 +14,10 @@ parser code{:
 
     public boolean syntaxErrors;
     public void syntax_error(Symbol current_token) {
-        report_error(
-            "Syntax error at line " + (current_token.left+1) + ", column "
-            + current_token.right, null
-        );
+        System.err.println("Syntax error at line " + (current_token.left + 1) +
+            ", column " + (current_token.right + 1) +
+            ": unexpected token \"" + current_token.value + "\"");
+        syntaxErrors = true; // Marcar que ocurrió un error
     }
     
 :}
@@ -124,6 +124,7 @@ statement ::= for {::}//{: System.out.println("Stmt detectado: For"); :}
             | unary_operation SEMICOLON //{: System.out.println("Stmt detectado: Operacion unaria"); :}
             | array_declaration 
             | array_access SEMICOLON;
+            | error SEMICOLON;
 
 block ::= LEFT_BRACE {:TablaSimbolos.abrirScope();:} code_block RIGHT_BRACE {:TablaSimbolos.cerrarScope();:};
 code_block ::= statement

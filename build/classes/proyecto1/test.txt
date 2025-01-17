@@ -4,7 +4,7 @@ _verano_ abreregalo cierraregalo abrecuento # {
     cometa _stringVariable_ entrega "Hola" finregalo
     
     # Prueba con operaciones relacionales
-    trueno _boolEjemplo1_ entrega 3 snowball 5 finregalo
+    trueno _boolEjemplo1_ entrega 3 snowball 5 finregalo 
     trueno _boolEjemplo2_ entrega 3 evergreen 6 finregalo
     trueno _boolEjemplo3_ entrega 3 minstix 5 finregalo
     trueno _boolEjemplo4_ entrega 7 upatree 5 finregalo
