@@ -20,7 +20,7 @@ import java.util.Scanner;
 
 
 public class Proyecto1 {
-    public static void menu(){
+public static void menu() throws FileNotFoundException {
                 Scanner scanner = new Scanner(System.in);
         boolean continuar = true;
 
@@ -30,7 +30,9 @@ public class Proyecto1 {
             System.out.println("2. Generar Parser.java y sym.java");
             System.out.println("3. Procesar archivo de entrada y escribir tokens");
             System.out.println("4. Eliminar archivos generados (Lexer,parser,sym)");
-            System.out.println("5. Salir");
+            System.out.println("5. Analizar sintacticamente archivo en especifico ");
+            System.out.println("6. Analizar sintacticamente test.txt ( + rapido )");
+            System.out.println("7. Salir");
             System.out.print("Seleccione una opcion: ");
 
             String opcion = scanner.nextLine();
@@ -79,38 +81,45 @@ public class Proyecto1 {
                     }
                     break;
                 case "5":
-                    continuar = false;
-                    System.out.println("Saliendo del programa...");
+                    System.out.print("Ingresa la ruta del archivo de entrada: ");
+                    String rutaEntradaParser = scanner.nextLine();
+                    try { 
+                        Reader file = new FileReader("src/proyecto1/test.txt");
+                        Lexer lexer = new Lexer(file);
+                        parse(lexer);
+                    } catch (FileNotFoundException e) {
+                        System.out.println("Error: Archivo no encontrado.");
+                    }
+                case "6":
+                    Reader file = new FileReader("src/proyecto1/test.txt");
+                    Lexer lexer = new Lexer(file);
+                    parser parser = new parser(lexer);
+                    try {
+                        parser.parse();
+                    }
+                    catch (Exception e){
+                        e.printStackTrace();
+                    }
                     break;
-
-                default:
-                    System.out.println("Opcion no valida. Intenta nuevamente.");
+                case "7":
+                    continuar = false;
             }
         }
 
         scanner.close();
     }
     public static void main(String[] args) throws FileNotFoundException {
-        generarArchivos();
-                // Crea una instancia de tu lexer con el input a analizar
-        Reader file = new FileReader("src/proyecto1/test.txt");
-        Lexer lexer = new Lexer(file);
-        // Crea el parser
-        parser parser = new parser(lexer);
-        
-
-        // Ejecuta el análisis sintáctico
-        try {
-            parser.parse();
-            //System.out.println("----------------------------");
-            //System.out.println("Analisis sintactico exitoso");
-            // Imprimir la tabla de símbolos
-            //parser.tablaSimbolos.imprimirTabla();
-        } catch (Exception e) {
-            System.out.println("Error en el análisis sintáctico: " + e.getMessage());
-        }
+        menu();
     }
 
+    public static void parse(Lexer lexer) {
+        parser parser = new parser(lexer);
+        try {
+            parser.parse();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     public static void generarLexer(String path) throws Exception {
         String[] arr = {path};
         jflex.Main.generate(arr);

@@ -19,10 +19,7 @@ parser code{:
             + current_token.right, null
         );
     }
-    //Inicialización de la tabla de simbolos
-    TablaSimbolos tablaSimbolos = new TablaSimbolos();
     
-
 :}
 
 init with {::};
@@ -47,13 +44,14 @@ terminal COMMA;
 
 // No terminales
 non terminal program, code_block, main;
-non terminal literal, comparator, arithmetic_operator, logical_operator;
-non terminal for, for_initialization, while, if, if_block, else, switch, single_case, cases, read, print, return;
+non terminal literal, comparator, arithmetic_operator;
+non terminal for, for_initialization, while, if, else, switch, single_case, cases, read, print, return;
 non terminal statement, expression, arithmetic_expression, relational_expression , logic_expression,unary_operation;
-non terminal type, type_declaration;
+non terminal type;
 non terminal declaration, variable_declaration, function_declaration;
 non terminal function_call, parameters, arguments;
 non terminal array_declaration, array_access, array_values_int, array_values_char;
+non terminal block;
 
 precedence left OR;       // Disyunción tiene menor precedencia
 precedence left AND;      // Conjunción tiene mayor precedencia que OR
@@ -73,9 +71,6 @@ type ::= INTEGER:tipo {:RESULT = "entero"; :} // Cargar tipos unicamente
        | CHAR:tipo {:RESULT = "char"; :}
        | STRING:tipo {:RESULT = "string"; :}
        | FLOAT:tipo {:RESULT = "flotante"; :};
-
-//Esto no se esta usando
-type_declaration ::= type:typeVar ID:idVar {:RESULT=typeVar;System.out.println("---Tipo: " + typeVar.toString()+ ", Lexema: " + idVar.toString());:};
 
 literal ::= ID
          | INTEGER_VAL 
@@ -102,9 +97,6 @@ comparator ::= LESS_THAN
              | NOT_EQUAL_TO ;
 expression ::= arithmetic_expression | relational_expression | logic_expression;
 
-logical_operator ::= AND
-                   | OR 
-                   | NOT;
 arithmetic_expression ::= literal 
             | function_call 
             | LEFT_PARENTHESIS arithmetic_expression RIGHT_PARENTHESIS 
@@ -133,40 +125,40 @@ statement ::= for {::}//{: System.out.println("Stmt detectado: For"); :}
             | array_declaration 
             | array_access SEMICOLON;
 
+block ::= LEFT_BRACE {:TablaSimbolos.abrirScope();:} code_block RIGHT_BRACE {:TablaSimbolos.cerrarScope();:};
 code_block ::= statement
              | expression
              | statement code_block
              | expression code_block;
 
-declaration ::= variable_declaration:type {: System.out.println("Declaracion detectada: Variable: "+ type.toString());  :} 
-              | function_declaration:type {: System.out.println("--Declaracion detectada: Función"); :}; 
+declaration ::= variable_declaration:type //{: System.out.println("Declaracion detectada: Variable: "+ type.toString());  :} 
+              | function_declaration:type ;//{: System.out.println("--Declaracion detectada: Función"); :}; 
 
 //Crear entrada de variable
 variable_declaration ::= type:typeVar ID:idVar SEMICOLON {:RESULT=typeVar;:}
                         | type:typeVar ID:idVar ASSIGNMENT expression SEMICOLON {:RESULT=typeVar;
-                          System.out.println("Variable"+idVar.toString());
-                          Simbolos simbolo = new Simbolos(idVar.toString(),typeVar.toString(),idVarleft,idVarright);
-                          tablaSimbolos.agregarSimbolo(simbolo);:};
+                          Simbolo simbolo = new Simbolo(idVar.toString(),typeVar.toString(),idVarleft,idVarright);
+                          TablaSimbolos.agregarSimbolo(simbolo);:};
 
 //Crear entrada de función
 function_declaration ::= type:typeVar ID:idVar LEFT_PARENTHESIS parameters RIGHT_PARENTHESIS LEFT_BRACE 
                         {:
-                            Simbolos simbolo = new Simbolos(idVar.toString(),typeVar.toString(),idVarleft,idVarright);
-                            simbolo.setFunction(typeVar.toString(), tablaSimbolos.getParametrosEnEspera());
-                            tablaSimbolos.limpiarParametrosEnEspera();
-                            tablaSimbolos.agregarSimbolo(simbolo);
+                            Simbolo simbolo = new Simbolo(idVar.toString(),typeVar.toString(),idVarleft,idVarright);
+                            simbolo.setFunction(typeVar.toString(), TablaSimbolos.getParametrosEnEspera());
+                            TablaSimbolos.limpiarParametrosEnEspera();
+                            TablaSimbolos.agregarSimbolo(simbolo);
                             
-                            tablaSimbolos.abrirScope();
+                            //TablaSimbolos.abrirScope();
                         :} 
-                        code_block RIGHT_BRACE {:tablaSimbolos.cerrarScope();:};
+                        code_block RIGHT_BRACE {: //TablaSimbolos.cerrarScope();:};
 
 parameters ::= type:typeVar ID:idVar {:
-                Simbolos simbolo = new Simbolos(idVar.toString(),typeVar.toString(),idVarleft,idVarright);
-                tablaSimbolos.agregarParametroEnEspera(simbolo);
+                Simbolo simbolo = new Simbolo(idVar.toString(),typeVar.toString(),idVarleft,idVarright);
+                TablaSimbolos.agregarParametroEnEspera(simbolo);
             :}//Entrada de parametros
              | type:typeVar ID:idVar COMMA parameters{:
-                Simbolos simbolo = new Simbolos(idVar.toString(),typeVar.toString(),idVarleft,idVarright);
-                tablaSimbolos.agregarParametroEnEspera(simbolo);
+                Simbolo simbolo = new Simbolo(idVar.toString(),typeVar.toString(),idVarleft,idVarright);
+                TablaSimbolos.agregarParametroEnEspera(simbolo);
             :};
 
 arguments ::= expression 
@@ -179,33 +171,27 @@ read ::= INPUT LEFT_PARENTHESIS expression RIGHT_PARENTHESIS SEMICOLON;
 
 print ::= PRINT LEFT_PARENTHESIS expression RIGHT_PARENTHESIS SEMICOLON;
 
-if ::= IF LEFT_PARENTHESIS expression RIGHT_PARENTHESIS LEFT_BRACE code_block RIGHT_BRACE
-    | IF LEFT_PARENTHESIS expression RIGHT_PARENTHESIS LEFT_BRACE code_block RIGHT_BRACE ELSE LEFT_BRACE code_block RIGHT_BRACE;
-
-if_block ::= LEFT_BRACE 
-             {: tablaSimbolos.abrirScope(); :} 
-             code_block RIGHT_BRACE 
-             {: tablaSimbolos.cerrarScope(); :};
+if ::= IF LEFT_PARENTHESIS expression RIGHT_PARENTHESIS block
+    | IF LEFT_PARENTHESIS expression RIGHT_PARENTHESIS block ELSE block; 
 
 for_initialization ::= type:typeVar ID:idVar 
                      | type:typeVar ID:idVar ASSIGNMENT INTEGER_VAL;
 
-for ::= FOR LEFT_PARENTHESIS for_initialization SEMICOLON expression SEMICOLON unary_operation RIGHT_PARENTHESIS LEFT_BRACE {:tablaSimbolos.abrirScope();:} code_block RIGHT_BRACE;
+for ::= FOR LEFT_PARENTHESIS for_initialization SEMICOLON expression SEMICOLON unary_operation RIGHT_PARENTHESIS block;
 
-while ::= WHILE LEFT_PARENTHESIS expression RIGHT_PARENTHESIS LEFT_BRACE {:tablaSimbolos.abrirScope();:} code_block RIGHT_BRACE {:tablaSimbolos.cerrarScope();:};
+while ::= WHILE LEFT_PARENTHESIS expression RIGHT_PARENTHESIS block;
 
 single_case ::= CASE expression COLON code_block BREAK SEMICOLON;
 
-cases ::= single_case 
-        | single_case cases;
+cases ::= single_case cases 
+        | single_case;
 
 switch ::= SWITCH LEFT_PARENTHESIS expression RIGHT_PARENTHESIS 
-           LEFT_BRACE cases RIGHT_BRACE 
-        | SWITCH LEFT_PARENTHESIS expression RIGHT_PARENTHESIS 
-           LEFT_BRACE cases DEFAULT COLON code_block BREAK SEMICOLON RIGHT_BRACE;
+           LEFT_BRACE {: TablaSimbolos.abrirScope(); :} 
+           cases DEFAULT COLON code_block BREAK SEMICOLON RIGHT_BRACE 
+           {: TablaSimbolos.cerrarScope(); :};
 
-main ::= MAIN LEFT_PARENTHESIS RIGHT_PARENTHESIS LEFT_BRACE code_block RIGHT_BRACE
-{: System.out.println("Funcion MAIN detectada"); :};
+main ::= MAIN LEFT_PARENTHESIS RIGHT_PARENTHESIS block;
 
 array_declaration ::= INTEGER LEFT_BRACKET RIGHT_BRACKET ID ASSIGNMENT LEFT_BRACE array_values_int RIGHT_BRACE SEMICOLON //{: System.out.println("Declaracion detectada: Array Int"); :}
                     | CHAR LEFT_BRACKET RIGHT_BRACKET ID ASSIGNMENT LEFT_BRACE array_values_char RIGHT_BRACE SEMICOLON ;//{: System.out.println("Declaracion detectada: Array Char"); :};
@@ -216,5 +202,4 @@ array_values_char ::= CHAR_VAL | CHAR_VAL COMMA array_values_char;
 array_access ::= ID LEFT_BRACKET INTEGER_VAL RIGHT_BRACKET ;//{: System.out.println("Se acceso a un array"); :};
 
 program ::= function_declaration program 
-         | main 
-         {:tablaSimbolos.imprimirScopeGlobal(); :};
+         | main;

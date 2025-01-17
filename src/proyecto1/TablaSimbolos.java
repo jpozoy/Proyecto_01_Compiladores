@@ -15,91 +15,80 @@ import java.util.Stack;
  * @author pozoj
  */
 public class TablaSimbolos {
-    Stack<Map<String, Simbolos>> scopes = new Stack<>();
-    private List<Simbolos> parametrosEnEspera = new ArrayList<>();
+    public static TablaSimbolos tablaActual = null;
+    private TablaSimbolos tablaAnterior;
+    private Map<String, Simbolo> tabla;
+    public static String espaciosPrint = "";
     
+    public static List<Simbolo> parametrosEnEspera = new ArrayList<>();
     
-    public TablaSimbolos() {
-        // Crear un scope global al inicializar
-        abrirScope();
+    public TablaSimbolos(TablaSimbolos tablaAnterior) {
+        tabla = new HashMap<>();
+        this.tablaAnterior = tablaAnterior;
+    }
+    public Simbolo buscarEnTabla(String nombre){
+        return tabla.get(nombre);
+    }
+    public List<Simbolo> getSimbolosTabla () {
+        return new ArrayList<>(tabla.values());
     }
     // Abrir un nuevo scope
-    public void abrirScope() {
-        scopes.push(new HashMap<>());
-        //System.out.println("Se abrio un scope");
+    public static void abrirScope() {
+        tablaActual = new TablaSimbolos(tablaActual);
+        
+        espaciosPrint = espaciosPrint + "        ";
+        System.out.println(espaciosPrint + "Inicio de scope:");
     }
 
     // Cerrar el scope actual
-    public void cerrarScope() {
-        if (scopes.size() > 1) { // Evitar cerrar el scope global
-            // Obtener el scope actual antes de cerrarlo
-            Map<String, Simbolos> scopeActual = scopes.peek();
-            // Imprimir los símbolos del scope actual
-            imprimirScope(scopeActual,"Local");
-            // Remover el scope actual de la pila
-            scopes.pop();
-        } else {
-            System.out.println("No se puede cerrar el scope global.");
+    public static void cerrarScope() {
+        if (tablaActual.tablaAnterior == null) 
+            return;
+
+        System.out.println(espaciosPrint + "Fin de scope");
+        espaciosPrint = espaciosPrint.replaceFirst("        ", "");    
+        
     }
-}
 
     // Agregar símbolo al scope actual
-    public boolean agregarSimbolo(Simbolos simbolo) {
-        if (scopes.isEmpty()) {
-            throw new IllegalStateException("No hay scopes abiertos");
+    public static boolean agregarSimbolo(Simbolo simbolo) {
+        if (tablaActual.tabla.get(simbolo.name) != null) {
+            throw new IllegalStateException("Error - Identificador duplicado: " +  simbolo.name);
         }
-        Map<String, Simbolos> scopeActual = scopes.peek();
-        if (scopeActual.containsKey(simbolo.name)) {
-            return false; // Símbolo ya declarado en este scope
-        }
-        scopeActual.put(simbolo.name, simbolo);
+        System.out.println(espaciosPrint + "Se agrego un simbolo: " + simbolo);
+        tablaActual.tabla.put(simbolo.name, simbolo);
         return true;
     }
 
     // Buscar símbolo (desde el scope actual hacia los superiores)
-    public Simbolos buscar(String nombre) {
-        for (int i = scopes.size() - 1; i >= 0; i--) {
-            Map<String, Simbolos> scope = scopes.get(i);
-            if (scope.containsKey(nombre)) {
-                return scope.get(nombre);
+    public static Simbolo buscar(String nombre) {
+        for (TablaSimbolos t = tablaActual; t != null; t = t.tablaAnterior) {
+            Simbolo simboloEncontrado = t.buscarEnTabla(nombre);
+            if (simboloEncontrado != null) {
+                return simboloEncontrado;
             }
         }
-        return null; // No encontrado
+        return null;
     }
-    //Imprimir la tabla de simbolos
-    public void imprimirTabla() {
-        System.out.println("Tabla de Simbolos:");
-        for (Map<String, Simbolos> scope : scopes) {
-            for (Simbolos simbolo : scope.values()) {
-                System.out.println(simbolo);
-            }
-        }
+    public static boolean asignarValor(String nombre, String valorNuevo){
+        Simbolo simbolo = buscar(nombre);
+        if (simbolo == null)
+            return false;
+        tablaActual.tabla.put(nombre, new Simbolo(valorNuevo, simbolo.type, simbolo.line, simbolo.column));
+        return true;
     }
-    // Método para imprimir un scope específico
-    public void imprimirScope(Map<String, Simbolos> scope, String scopeName) {
-        System.out.println("-------------------------------------");
-        System.out.println("Tabla de simbolos del scope: " + scopeName);
-        for (Simbolos simbolo : scope.values()) {
-            System.out.println(simbolo);
-        }
-        System.out.println("-------------------------------------");
-    }
-    public void imprimirScopeGlobal() {
-        Map<String, Simbolos> scopeActual = scopes.peek();
-        imprimirScope(scopeActual, "Global");
-    };
-    
+
     //Gestión de asociación de parametros
-    public void agregarParametroEnEspera(Simbolos parametro) {
+    public static void agregarParametroEnEspera(Simbolo parametro) {
         //System.out.println("Se proceso un parametro en espera:");
         parametrosEnEspera.add(parametro);
     }
 
-    public List<Simbolos> getParametrosEnEspera() {
+    public static List<Simbolo> getParametrosEnEspera() {
         return new ArrayList<>(parametrosEnEspera);
     }
 
-    public void limpiarParametrosEnEspera() {
+    public static void limpiarParametrosEnEspera() {
         parametrosEnEspera.clear();
     }
 }
