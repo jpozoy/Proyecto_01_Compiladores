@@ -14,10 +14,10 @@ parser code{:
 
     public boolean syntaxErrors;
     public void syntax_error(Symbol current_token) {
-        report_error(
-            "Syntax error at line " + (current_token.left+1) + ", column "
-            + current_token.right, null
-        );
+        System.err.println("Syntax error at line " + (current_token.left + 1) +
+            ", column " + (current_token.right + 1) +
+            ": unexpected token \"" + current_token.value + "\"");
+        syntaxErrors = true; // Marca que ocurrió un error
     }
     //Inicialización de la tabla de simbolos
     TablaSimbolos tablaSimbolos = new TablaSimbolos();
@@ -48,7 +48,7 @@ terminal COMMA;
 // No terminales
 non terminal program, code_block, main;
 non terminal literal, comparator, arithmetic_operator, logical_operator;
-non terminal for, for_initialization, while, if, if_block, else, switch, single_case, cases, read, print, return;
+non terminal for, for_initialization, while, if, else, switch, single_case, cases, read, print, return;
 non terminal statement, expression, arithmetic_expression, relational_expression , logic_expression,unary_operation;
 non terminal type, type_declaration;
 non terminal declaration, variable_declaration, function_declaration;
@@ -75,7 +75,7 @@ type ::= INTEGER:tipo {:RESULT = "entero"; :} // Cargar tipos unicamente
        | FLOAT:tipo {:RESULT = "flotante"; :};
 
 //Esto no se esta usando
-type_declaration ::= type:typeVar ID:idVar {:RESULT=typeVar;System.out.println("---Tipo: " + typeVar.toString()+ ", Lexema: " + idVar.toString());:};
+//type_declaration ::= type:typeVar ID:idVar {:RESULT=typeVar;System.out.println("---Tipo: " + typeVar.toString()+ ", Lexema: " + idVar.toString());:};
 
 literal ::= ID
          | INTEGER_VAL 
@@ -131,20 +131,21 @@ statement ::= for {::}//{: System.out.println("Stmt detectado: For"); :}
             | NOT expression SEMICOLON //{: System.out.println("Stmt detectado: NOT"); :}
             | unary_operation SEMICOLON //{: System.out.println("Stmt detectado: Operacion unaria"); :}
             | array_declaration 
-            | array_access SEMICOLON;
+            | array_access SEMICOLON
+            | error SEMICOLON;
 
 code_block ::= statement
              | expression
              | statement code_block
              | expression code_block;
 
-declaration ::= variable_declaration:type {: System.out.println("Declaracion detectada: Variable: "+ type.toString());  :} 
-              | function_declaration:type {: System.out.println("--Declaracion detectada: Función"); :}; 
+declaration ::= variable_declaration:type //{: System.out.println("Declaracion detectada: Variable: "+ type.toString());  :} 
+              | function_declaration:type ;//{: System.out.println("--Declaracion detectada: Función"); :}; 
 
 //Crear entrada de variable
 variable_declaration ::= type:typeVar ID:idVar SEMICOLON {:RESULT=typeVar;:}
                         | type:typeVar ID:idVar ASSIGNMENT expression SEMICOLON {:RESULT=typeVar;
-                          System.out.println("Variable"+idVar.toString());
+                          //System.out.println("Variable"+idVar.toString());
                           Simbolos simbolo = new Simbolos(idVar.toString(),typeVar.toString(),idVarleft,idVarright);
                           tablaSimbolos.agregarSimbolo(simbolo);:};
 
@@ -179,20 +180,15 @@ read ::= INPUT LEFT_PARENTHESIS expression RIGHT_PARENTHESIS SEMICOLON;
 
 print ::= PRINT LEFT_PARENTHESIS expression RIGHT_PARENTHESIS SEMICOLON;
 
-if ::= IF LEFT_PARENTHESIS expression RIGHT_PARENTHESIS LEFT_BRACE code_block RIGHT_BRACE
-    | IF LEFT_PARENTHESIS expression RIGHT_PARENTHESIS LEFT_BRACE code_block RIGHT_BRACE ELSE LEFT_BRACE code_block RIGHT_BRACE;
-
-if_block ::= LEFT_BRACE 
-             {: tablaSimbolos.abrirScope(); :} 
-             code_block RIGHT_BRACE 
-             {: tablaSimbolos.cerrarScope(); :};
+if ::= IF LEFT_PARENTHESIS expression RIGHT_PARENTHESIS LEFT_BRACE {:tablaSimbolos.abrirScope();:} code_block RIGHT_BRACE {:tablaSimbolos.cerrarScope();:}
+    | if  ELSE LEFT_BRACE {:tablaSimbolos.abrirScope();:} code_block RIGHT_BRACE {:tablaSimbolos.cerrarScope();:}; 
 
 for_initialization ::= type:typeVar ID:idVar 
                      | type:typeVar ID:idVar ASSIGNMENT INTEGER_VAL;
 
-for ::= FOR LEFT_PARENTHESIS for_initialization SEMICOLON expression SEMICOLON unary_operation RIGHT_PARENTHESIS LEFT_BRACE {:tablaSimbolos.abrirScope();:} code_block RIGHT_BRACE;
+for ::= FOR LEFT_PARENTHESIS for_initialization SEMICOLON expression SEMICOLON unary_operation RIGHT_PARENTHESIS LEFT_BRACE {:tablaSimbolos.abrirScope();:} code_block RIGHT_BRACE {:tablaSimbolos.cerrarScope();:};
 
-while ::= WHILE LEFT_PARENTHESIS expression RIGHT_PARENTHESIS LEFT_BRACE {:tablaSimbolos.abrirScope();:} code_block RIGHT_BRACE {:tablaSimbolos.cerrarScope();:};
+while ::= WHILE LEFT_PARENTHESIS expression RIGHT_PARENTHESIS LEFT_BRACE  {:tablaSimbolos.abrirScope();:} code_block RIGHT_BRACE {:tablaSimbolos.cerrarScope();:};
 
 single_case ::= CASE expression COLON code_block BREAK SEMICOLON;
 

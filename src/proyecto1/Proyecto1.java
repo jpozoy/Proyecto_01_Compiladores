@@ -102,10 +102,11 @@ public class Proyecto1 {
         // Ejecuta el análisis sintáctico
         try {
             parser.parse();
-            //System.out.println("----------------------------");
-            //System.out.println("Analisis sintactico exitoso");
-            // Imprimir la tabla de símbolos
-            //parser.tablaSimbolos.imprimirTabla();
+            if (parser.syntaxErrors) {
+                System.err.println("El archivo no puede ser generado por la gramatica.");
+            } else {
+                System.out.println("El archivo puede ser generado por la gramatica.");
+            }
         } catch (Exception e) {
             System.out.println("Error en el análisis sintáctico: " + e.getMessage());
         }
