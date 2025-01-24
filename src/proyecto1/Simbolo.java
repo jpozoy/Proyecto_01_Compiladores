@@ -14,6 +14,7 @@ import java_cup.runtime.Symbol;
  */
 public class Simbolo {
     String name;  // Lexema
+    Object value; // Valor (si es constante)
     String type;  // Tipo (int, float, etc.)
     int line;     // Línea de declaración
     int column;   // Columna de declaración
@@ -30,11 +31,33 @@ public class Simbolo {
         this.returnType = null;
         this.parameters = new ArrayList<>();
     }
-
+    public List<Simbolo> getParameters() {
+        return parameters;
+    }
     public void setFunction(String returnType, List<Simbolo> parameters) {
         this.isFunction = true;
         this.returnType = returnType;
+        this.type = returnType;
         this.parameters = parameters;
+    }
+
+    public void setValue(Object value) {
+        this.value = value;
+    }
+    public Integer getValueAsInteger() {
+        return (Integer) value;
+    }
+    public Float getValueAsFloat() {
+        return (Float) value;
+    }
+    public String getValueAsString() {
+        return (String) value;
+    }
+    public Boolean getValueAsBoolean() {
+        return (Boolean) value;
+    }
+    public Object getValue() {
+        return value;
     }
     @Override
     public String toString() {

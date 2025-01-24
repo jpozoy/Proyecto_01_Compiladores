@@ -38,9 +38,9 @@ ONELINE_COMMENT=\#.*
 {MULTILINE_COMMENT} {/* No hace nada */}
 {ONELINE_COMMENT} {/* No hace nada */}
 
-{NUMBER} {return symbol(sym.INTEGER_VAL, Integer.parseInt(yytext()));}
-{FLOAT} {return symbol(sym.FLOAT_VAL, Double.parseDouble(yytext()));}
-{BOOL} {return symbol(sym.BOOL_VAL, Boolean.parseBoolean(yytext()));}
+{NUMBER} {return symbol(sym.INTEGER_VAL, yytext());}
+{FLOAT} {return symbol(sym.FLOAT_VAL, yytext());}
+{BOOL} {return symbol(sym.BOOL_VAL, yytext());}
 {CHAR} {return symbol(sym.CHAR_VAL, yytext().charAt(1));} // Extrae el caracter entre las comillas.
 {STRING} {return symbol(sym.STRING_VAL, yytext().substring(1, yytext().length() - 1));} // Remueve las comillas.
 

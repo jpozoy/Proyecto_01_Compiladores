@@ -44,7 +44,7 @@ public class TablaSimbolos {
     public static void cerrarScope() {
         if (tablaActual.tablaAnterior == null) 
             return;
-
+        tablaActual = tablaActual.tablaAnterior;
         System.out.println(espaciosPrint + "Fin de scope");
         espaciosPrint = espaciosPrint.replaceFirst("        ", "");    
         

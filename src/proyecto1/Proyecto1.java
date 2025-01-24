@@ -126,7 +126,21 @@ public static void menu() throws FileNotFoundException {
         scanner.close();
     }
     public static void main(String[] args) throws FileNotFoundException {
-        menu();
+        generarArchivos();
+        Reader file = new FileReader("src/proyecto1/test.txt");
+        Lexer lexer = new Lexer(file);
+        parser parser = new parser(lexer);
+        try {                
+            parser.parse();
+            if (parser.syntaxErrors) {
+                System.err.println("El archivo no puede ser generado por la gramatica.");
+            } else {
+                System.out.println("El archivo puede ser generado por la gramatica.");
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public static void parse(Lexer lexer) {
