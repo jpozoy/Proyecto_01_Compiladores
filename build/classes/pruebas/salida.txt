@@ -1,15 +1,2 @@
-Tipo: 6, Lexema: bromista, Linea: 0, Columna: 0
-Tipo: 45, Lexema: _func1_, Linea: 0, Columna: 9
-Tipo: 12, Lexema: abreregalo, Linea: 0, Columna: 17
-Tipo: 4, Lexema: cupido, Linea: 0, Columna: 28
-Tipo: 45, Lexema: _x22_, Linea: 0, Columna: 35
-Tipo: 51, Lexema: ,, Linea: 0, Columna: 41
-Tipo: 4, Lexema: cupido, Linea: 0, Columna: 43
-Tipo: 45, Lexema: _x22_, Linea: 0, Columna: 50
-Tipo: 13, Lexema: cierraregalo, Linea: 0, Columna: 56
-Tipo: 7, Lexema: abrecuento, Linea: 0, Columna: 69
-Tipo: 4, Lexema: cupido, Linea: 1, Columna: 0
-Tipo: 45, Lexema: _miChar_, Linea: 1, Columna: 7
-Tipo: 11, Lexema: entrega, Linea: 1, Columna: 16
-Tipo: 49, Lexema: !, Linea: 1, Columna: 24
-Tipo: 31, Lexema: finregalo, Linea: 1, Columna: 28
+Tipo: 2, Lexema: rodolfo, Linea: 1, Columna: 0
+Tipo: 8, Lexema: cierracuento, Linea: 138, Columna: 0

@@ -61,13 +61,13 @@ public static void menu() throws FileNotFoundException {
                     break;
 
                 case "3":
-                    System.out.print("Ingresa la ruta del archivo de entrada: ");
-                    String rutaEntrada = scanner.nextLine();
-                    System.out.print("Ingresa la ruta del archivo de salida: ");
-                    String rutaSalida = scanner.nextLine();
+//                    System.out.print("Ingresa la ruta del archivo de entrada: ");
+//                    String rutaEntrada = scanner.nextLine();
+//                    System.out.print("Ingresa la ruta del archivo de salida: ");
+//                    String rutaSalida = scanner.nextLine();
                     try {
-                        escribirTokens(rutaEntrada, rutaSalida);
-                        System.out.println("Tokens procesados y guardados en " + rutaSalida);
+                        escribirTokens("src/proyecto1/test.txt", "src/pruebas/salida.txt");
+                        System.out.println("Tokens procesados y guardados en " + "src/pruebas/salida.txt");
                     } catch (Exception e) {
                         System.err.println("Error al procesar el archivo de entrada: " + e.getMessage());
                     }

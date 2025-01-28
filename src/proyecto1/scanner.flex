@@ -22,14 +22,14 @@ import java_cup.runtime.*;
 
 /* Definiciones de patrones */
 NUMBER =-?(0|[1-9][0-9]*)
-ID =_\D[a-zA-Z0-9_]+_
+ID =_\D[a-zA-Z0-9_]*_
 FLOAT=[+-]?([0-9]*[.])?[0-9]+
 BOOL=true|false
 CHAR='(.){1}'
 STRING=\"([^\"]*)\"
 
 SPACE=[ \t\r\n]+
-MULTILINE_COMMENT=\_([^_]|_[^\/])*_\/
+MULTILINE_COMMENT=\\_([^_]|_[^\/])*_\/
 ONELINE_COMMENT=\#.*
 
 %%
@@ -46,7 +46,7 @@ ONELINE_COMMENT=\#.*
 
 
 "," {return symbol(sym.COMMA, ",");}
-
+ 
 "rodolfo" {return symbol(sym.INTEGER, "rodolfo");}
 "bromista" {return symbol(sym.FLOAT, "bromista");}
 "trueno" {return symbol(sym.BOOLEAN, "trueno");}

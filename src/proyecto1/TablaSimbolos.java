@@ -15,7 +15,7 @@ import java.util.Stack;
  * @author pozoj
  */
 public class TablaSimbolos {
-    public static TablaSimbolos tablaActual = null;
+    public static TablaSimbolos tablaActual = new TablaSimbolos(null);
     private TablaSimbolos tablaAnterior;
     private Map<String, Simbolo> tabla;
     public static String espaciosPrint = "";
@@ -37,7 +37,7 @@ public class TablaSimbolos {
         tablaActual = new TablaSimbolos(tablaActual);
         
         espaciosPrint = espaciosPrint + "        ";
-        System.out.println(espaciosPrint + "Inicio de scope:");
+        //System.out.println(espaciosPrint + "Inicio de scope:");
     }
 
     // Cerrar el scope actual
@@ -45,7 +45,7 @@ public class TablaSimbolos {
         if (tablaActual.tablaAnterior == null) 
             return;
         tablaActual = tablaActual.tablaAnterior;
-        System.out.println(espaciosPrint + "Fin de scope");
+        //ystem.out.println(espaciosPrint + "Fin de scope");
         espaciosPrint = espaciosPrint.replaceFirst("        ", "");    
         
     }
@@ -55,7 +55,7 @@ public class TablaSimbolos {
         if (tablaActual.tabla.get(simbolo.name) != null) {
             throw new IllegalStateException("Error - Identificador duplicado: " +  simbolo.name);
         }
-        System.out.println(espaciosPrint + "Se agrego un simbolo: " + simbolo);
+        //System.out.println(espaciosPrint + "Se agrego un simbolo: " + simbolo);
         tablaActual.tabla.put(simbolo.name, simbolo);
         return true;
     }

@@ -14,13 +14,15 @@ import java_cup.runtime.Symbol;
  */
 public class Simbolo {
     String name;  // Lexema
-    Object value; // Valor (si es constante)
+    String value; // Valor (si es constante)
     String type;  // Tipo (int, float, etc.)
     int line;     // Línea de declaración
     int column;   // Columna de declaración
     boolean isFunction; // Indica si es función
     String returnType;  // Tipo de retorno (si es función)
     List<Simbolo> parameters; // Argumentos y sus tipos (si es función)
+    boolean isArray; // Indica si es un arreglo
+    int arraySize; // Tamaño del arreglo    
 
     public Simbolo(String name, String type, int line, int column) {
         this.name = name;
@@ -29,6 +31,7 @@ public class Simbolo {
         this.column = column;
         this.isFunction = false;
         this.returnType = null;
+        this.value = null; 
         this.parameters = new ArrayList<>();
     }
     public List<Simbolo> getParameters() {
@@ -41,23 +44,26 @@ public class Simbolo {
         this.parameters = parameters;
     }
 
-    public void setValue(Object value) {
+    public void setArray() {
+        this.isArray = true;
+    }
+    public boolean isArray() {
+        return isArray;
+    }
+    public void setArraySize(int size) {
+        this.arraySize = size;
+    }
+    public boolean isFunction() {
+        return isFunction;
+    }
+    public void setValue(String value) {
         this.value = value;
     }
-    public Integer getValueAsInteger() {
-        return (Integer) value;
-    }
-    public Float getValueAsFloat() {
-        return (Float) value;
-    }
-    public String getValueAsString() {
-        return (String) value;
-    }
-    public Boolean getValueAsBoolean() {
-        return (Boolean) value;
-    }
-    public Object getValue() {
+    public String getValue() {
         return value;
+    }
+    public String getType() {
+        return type;
     }
     @Override
     public String toString() {
@@ -65,8 +71,8 @@ public class Simbolo {
             return String.format("Funcion: %s, Tipo Retorno: %s, Parametros: %s, Linea: %d, Columna: %d", 
                 name, returnType, parameters, line, column);
         } else {
-            return String.format("Variable: %s, Tipo: %s, Linea: %d, Columna: %d", 
-                name, type, line, column);
+            return String.format("Variable: %s, Tipo: %s, Linea: %d, Columna: %d, Valor: %s", 
+                name, type, line, column, value);
         }
     }
 }
