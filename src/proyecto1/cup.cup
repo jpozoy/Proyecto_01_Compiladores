@@ -24,7 +24,7 @@ parser code{:
     String tac = "";
     int tempCount = 0;
     int labelCount = 0;
-    boolean commentTac = true;
+    boolean commentTac = false;
 
     String currentSwitchExpression = "";
     String currentSwitchLabel = "";
@@ -172,7 +172,7 @@ non terminal function_call, parameters, arguments;
 non terminal array_declaration, array_access, array_values;
 non terminal block;
 non terminal literal, value_assignment, array_position_assignment, array_declaration_aux;
-non terminal case1, case2, switch_aux, program_aux;
+non terminal case1, switch_aux, program_aux;
 
 precedence left OR;       // Disyunción tiene menor precedencia
 precedence left AND;      // Conjunción tiene mayor precedencia que OR
@@ -321,7 +321,8 @@ expression ::= literal:i {:RESULT = i.toString();:}
                 } else {
                     throw new IllegalArgumentException("Incompatible type for NOT operation, only boolean is allowed.");
                 }
-            :};
+            :}
+            | array_access:a {:RESULT = a.toString();:};
 
 statement ::= for // Ya
             | while // Ya
@@ -454,7 +455,7 @@ arguments ::= expression:e {:
             RESULT = e.toString() + "," + a.toString();
             :}| {:RESULT = "";:};
 
-return ::= RETURN expression:e SEMICOLON {:emit("return "+e.toString());:}
+return ::= RETURN expression:e SEMICOLON {:emit("return "+getValue(e.toString()));:}
          | RETURN SEMICOLON {:emit("return");:};
 
 read ::= INPUT LEFT_PARENTHESIS ID:id RIGHT_PARENTHESIS SEMICOLON 
@@ -516,7 +517,6 @@ for_initialization ::= type:typeVar ID:idVar ASSIGNMENT expression:e
 for ::= {:if (commentTac) emit("// For loop --------------");:} 
         FOR LEFT_PARENTHESIS for_initialization SEMICOLON expression:e SEMICOLON unary_operation:u RIGHT_PARENTHESIS {:
         String tipo = getType(e.toString());
-        System.out.println("Tipo: " + tipo);
         if (!tipo.equals("bool"))
             throw new IllegalArgumentException("Expression in for has to be of type boolean.");
         String endLabel = newLabel();
@@ -600,7 +600,7 @@ switch_aux ::= SWITCH LEFT_PARENTHESIS expression:e RIGHT_PARENTHESIS
            :} 
            cases;
 switch ::= switch_aux RIGHT_BRACE 
-           {: TablaSimbolos.cerrarScope(); String endLabel = stackEndLabels.pop(); emit(endLabel + ":"); :}
+           {: TablaSimbolos.cerrarScope(); String endLabel = stackEndLabels.pop(); emit(currentSwitchLabel + ":"); emit(endLabel + ":"); :}
            | switch_aux DEFAULT COLON {:emit(currentSwitchLabel + ":");:} code_block RIGHT_BRACE 
            {: TablaSimbolos.cerrarScope(); String endLabel = stackEndLabels.pop(); emit(endLabel + ":"); :};
 
@@ -619,7 +619,6 @@ LEFT_BRACKET expression:s {:
         if (simboloBuscar != null) 
             throw new IllegalArgumentException("ID " + id.toString() + " already exists.");
         Simbolo simbolo = new Simbolo(id.toString(), t.toString(), idleft, idright);
-        System.out.println("sim: "+simbolo);
         simbolo.setArray();
         TablaSimbolos.agregarSimbolo(simbolo);
         RESULT = t.toString() + ":" + id.toString();
@@ -628,12 +627,13 @@ LEFT_BRACKET expression:s {:
 array_declaration ::= array_declaration_aux:t ASSIGNMENT LEFT_BRACE array_values:v {:
      String[] values = v.toString().split(",");
      int i = 0;
-     Simbolo simbolo = TablaSimbolos.buscar(t.toString().split(":")[1]);  
+     String[] infoArray = t.toString().split(":");
+     Simbolo simbolo = TablaSimbolos.buscar(infoArray[1]);  
      simbolo.setArraySize(values.length);
      for (String value: values) {
          if (!getType(value).equals(getType(t.toString())))
             throw new IllegalArgumentException("Array values have to be of the same type as the array.");
-            emit(values[1] + "[" + i + "]=" + getValue(value));
+            emit(infoArray[1] + "[" + i + "]=" + getValue(value));
             i++;
      }
     :} RIGHT_BRACE SEMICOLON 
@@ -652,10 +652,14 @@ array_access ::= ID:id LEFT_BRACKET expression:e {:
         throw new IllegalArgumentException("ID " + id.toString() + " is not an array.");
     String temp = newTemp();
     emit(temp + "=" + id.toString() + "[" + getValue(e.toString()) + "]");
-    RESULT = simbolo.type + ":" + temp;
+    RESULT = simbolo.type + ":" + temp + ":" + id.toString() + "[" + getValue(e.toString()) + "]";
 :} RIGHT_BRACKET; //{: System.out.println("Se acceso a un array"); :};
 
-array_position_assignment ::= array_access ASSIGNMENT expression:e {:RESULT=e.toString();:};
+array_position_assignment ::= array_access:a ASSIGNMENT expression:e {:
+    if (!getType(a.toString()).equals(getType(e.toString())))
+        throw new IllegalArgumentException("Incompatible types for array position assignment." + getType(a.toString()) + " and " + getType(e.toString()) + " are not compatible.");
+    emit(a.toString().split(":")[2]+"="+getValue(e.toString()));
+RESULT=e.toString();:};
 
 
 main ::= MAIN LEFT_PARENTHESIS RIGHT_PARENTHESIS block;
@@ -664,3 +668,5 @@ program ::= program_aux;
 
 program_aux ::= function_declaration program_aux
             | main {:System.out.println(tac);:}; 
+
+            

@@ -86,7 +86,7 @@ _verano_ abreregalo cierraregalo  abrecuento # {
         trueno _pruebaConjuncion_ entrega false finregalo
     cierracuento
 
-
+    
     # Llamada a funcion
     _funcion_ abreregalo cierraregalo finregalo
 
@@ -171,9 +171,10 @@ _verano_ abreregalo cierraregalo  abrecuento # {
     cierracuento
     # Declaracion arrays, int y char
     rodolfo abreempaque 9 navidad 5 cierraempaque _arregloInt_ finregalo
-    cupido abreempaque 8 cierraempaque _arregloChar_ entrega abrecuento 'c','v','k' cierracuento finregalo
+    cupido abreempaque 8 cierraempaque _g_ entrega abrecuento 'c','v','k' cierracuento finregalo
 
-    _arregloChar_ abreempaque 1 cierraempaque entrega 7 finregalo
+
+    _arregloInt_ abreempaque 1 cierraempaque entrega _arregloInt_ abreempaque 0 cierraempaque finregalo
 
 \_
 comentario
