@@ -667,6 +667,10 @@ main ::= MAIN LEFT_PARENTHESIS RIGHT_PARENTHESIS block;
 program ::= program_aux;
 
 program_aux ::= function_declaration program_aux
-            | main {:System.out.println(tac);:}; 
+            | main {:System.out.println(tac); 
+              MipsGenerator generador = new MipsGenerator(tac);
+              generador.procesarTac();
+              generador.getCodigoMIPS();
+            :}; 
 
             

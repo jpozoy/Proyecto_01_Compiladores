@@ -219,6 +219,7 @@ public static void menu() throws FileNotFoundException {
         try{
             generarCup("src/proyecto1/cup.cup");
             
+            
         }
         catch (Exception e) {
            System.out.println("CUP");

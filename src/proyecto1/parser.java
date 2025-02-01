@@ -2567,7 +2567,11 @@ RESULT=e.toString();
           case 112: // program_aux ::= main 
             {
               Object RESULT =null;
-		System.out.println(tac);
+		System.out.println(tac); 
+              MipsGenerator generador = new MipsGenerator(tac);
+              generador.procesarTac();
+              generador.getCodigoMIPS();
+            
               CUP$parser$result = parser.getSymbolFactory().newSymbol("program_aux",35, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
