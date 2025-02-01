@@ -14,17 +14,29 @@ public class GestorRegistros {
             registros.put("$t" + i, new Registro("$t" + i));
         }
     }
+    
+    
+    public String asignarRegistro() {
+        for (Registro reg : registros.values()) {
+            if (reg.isDisponible()) {
+                reg.asignarEtiqueta("");
+                return reg.getEnsamblador(); // Retorna el registro asignado
+        }
+    }
+    return null; // No hay registros disponibles
+    }
 
     // Asigna una etiqueta temporal a un registro disponible
-    public boolean asignarRegistro(String etiqueta) {
+    public String asignarRegistroTemp(String etiqueta) {
         for (Registro reg : registros.values()) {
             if (reg.isDisponible()) {
                 reg.asignarEtiqueta(etiqueta);
-                return true;
+                return reg.getEnsamblador(); // Retorna el registro asignado
             }
         }
-        return false; // No hay registros disponibles
+        return null; // No hay registros disponibles
     }
+
 
     // Libera un registro basado en la etiqueta temporal
     public boolean liberarRegistro(String etiqueta) {
@@ -36,6 +48,18 @@ public class GestorRegistros {
         }
         return false; // No se encontró la etiqueta
     }
+    
+    //Obtener registro por etiqueta
+    public String obtenerRegistroPorEtiqueta(String etiqueta) {
+    for (Map.Entry<String, Registro> entry : registros.entrySet()) {
+        if (etiqueta.equals(entry.getValue().getEtiqueta())) {
+            return entry.getKey(); // Retorna el nombre del registro ($t0, $t1, etc.)
+        }
+    }
+    return null; // No se encontró la etiqueta
+}
+
+  
 
     // Imprime el estado actual de los registros
     public void mostrarRegistros() {

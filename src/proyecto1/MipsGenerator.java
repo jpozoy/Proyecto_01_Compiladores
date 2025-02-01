@@ -1,5 +1,7 @@
 package proyecto1;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MipsGenerator {
     //TAC
@@ -8,6 +10,8 @@ public class MipsGenerator {
     private StringBuilder text;
     //MIPS final
     private StringBuilder codigoMips;
+    //Estructura de gestor de registros
+    private GestorRegistros gestorRegistros;
     
     //Encontrar y reservar estructuras estaticas: Strings, Arrays
     
@@ -16,6 +20,7 @@ public class MipsGenerator {
             this.codigoMips = new StringBuilder();
             this.data = new StringBuilder(".data\n");
             this.text = new StringBuilder(".text\n");
+            this.gestorRegistros = new GestorRegistros();
             System.out.println("Esto sucede");
     }
     public void procesarTac() {
@@ -54,7 +59,7 @@ public class MipsGenerator {
     //Si es un entero
     public void procesarInt(String line) {
         String[] partes = line.split(":|="); // Divide por ":" o "="
-
+        
         if (partes.length < 3) return; // Evita errores en líneas incorrectas
 
         String nombre = partes[1].trim(); // Obtiene el nombre de la variable
@@ -70,6 +75,75 @@ public class MipsGenerator {
     public void procesarTemporal(String line){
         System.out.println("Se Proceso un temporal");
         System.out.println(line);
+        String[] partes = line.split("="); // Divide por "="
+        String etiqueta = partes[0].trim(); // "t0", "t1",
+        String expresion = partes[1].trim();
+        
+        // Detectar operador (+, -, *, /, %)
+        Pattern pattern = Pattern.compile("(.+?)([+\\-*/%])(.+)");
+        Matcher matcher = pattern.matcher(expresion);
+        if (matcher.matches()) {
+            String operando1 = matcher.group(1).trim(); // Primer operando
+            String operador = matcher.group(2).trim();  // Operador
+            String operando2 = matcher.group(3).trim(); // Segundo operando
+
+            System.out.println("Etiqueta Temporal: " + etiqueta);
+            System.out.println("Operando 1: " + operando1);
+            System.out.println("Operador: " + operador);
+            System.out.println("Operando 2: " + operando2);
+            traducirTemporal(etiqueta, operando1, operando2, operador);
+        } else {
+            System.out.println("Formato inválido: " + line);
+        }
+        
+        
+        
+    }
+    public void traducirTemporal(String temporal, String op1, String op2, String operador){
+         String reg1, reg2, regRes;
+         if (op1.matches("^-?\\d+$")) { //Si es un numero
+             reg1 = gestorRegistros.asignarRegistro();
+             text.append("li " + reg1 + ", " + op1 + "\n");
+         } else if (op1.matches("^t\\d+$")){ //Si es un temporal
+             reg1 = gestorRegistros.obtenerRegistroPorEtiqueta(op1);
+             
+         } else { //Si es un identificador
+             reg1 = gestorRegistros.asignarRegistroTemp(op1);
+             text.append("lw " + reg1 + ", " + op1 + "\n");
+         }
+         if (op2.matches("^-?\\d+$")) { //Si es un numero
+             reg2 = gestorRegistros.asignarRegistro();
+             text.append("li " + reg2 + ", " + op2 + "\n");
+         } else if (op2.matches("^t\\d+$")){ //Si es un temporal
+             reg2 = gestorRegistros.obtenerRegistroPorEtiqueta(op2);
+         } else { //Si es un identificador
+             reg2 = gestorRegistros.asignarRegistroTemp(op2);
+             text.append("lw " + reg2 + ", " + op2 + "\n");
+         }
+         regRes = gestorRegistros.asignarRegistroTemp(temporal);
+         if (regRes == null) {
+            System.out.println("Error: No hay registros disponibles.");
+            return;
+        }
+        // Generar la operación MIPS
+        switch (operador) {
+            case "+": text.append("add " + regRes + ", " + reg1 + ", " + reg2 + "\n"); break;
+            case "-": text.append("sub " + regRes + ", " + reg1 + ", " + reg2 + "\n"); break;
+            case "*": text.append("mul " + regRes + ", " + reg1 + ", " + reg2 + "\n"); break;
+            case "/": text.append("div " + reg1 + ", " + reg2 + "\n" + "mflo " + regRes + "\n"); break;
+            case "%": text.append("div " + reg1 + ", " + reg2 + "\n" + "mfhi " + regRes + "\n"); break;
+            default:
+                System.out.println("Error: Operador no reconocido.");
+                return;
+        }
+        // Liberar registros temporales si no son resultado
+        gestorRegistros.liberarRegistro(op1);
+        gestorRegistros.liberarRegistro(op2);
+         
+        
+        // Si op es un numero cargar imediato
+        // Si op es un temporal buscarlo en la estrucutura y agregar utilizar el registro asignado
+        // Finalmete asignar el temporal a un registro y realizar la operación correspondiente con los registros utilizados
     }
 
     //Imprimir codigo momentaneamente 

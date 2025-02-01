@@ -6,7 +6,7 @@ package proyecto1;
 
 class Registro {
     private String ensamblador;  // Nombre del registro en ensamblador ($t0, $t1...)
-    private String etiqueta;      // Etiqueta temporal asociada (t1, t2...)
+    private String etiqueta;      // Etiqueta temporal asociada (t1, t2...) o id
     private boolean disponible;   // Estado de disponibilidad
 
     public Registro(String ensamblador) {
