@@ -38,10 +38,10 @@ public class GestorRegistros {
     }
 
 
-    // Libera un registro basado en la etiqueta temporal
+    // Libera un registro basado en el registro utilizado
     public boolean liberarRegistro(String etiqueta) {
         for (Registro reg : registros.values()) {
-            if (etiqueta.equals(reg.getEtiqueta())) {
+            if (etiqueta.equals(reg.getEnsamblador())) {
                 reg.liberar();
                 return true;
             }

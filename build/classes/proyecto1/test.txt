@@ -11,7 +11,9 @@ _verano_ abreregalo cierraregalo  abrecuento # {
     rodolfo _resultadoDivision_ entrega _hola_ reyes 3 finregalo
     rodolfo _resultadoMultiplicacion_ entrega _hola_ nochebuena 5 finregalo
     rodolfo _resultadoModulo_ entrega 10 magos 3 finregalo
-    rodolfo _resultadoPotencia_ entrega _hola_ adviento _adios_ finregalo
+    #rodolfo _resultadoPotencia_ entrega _hola_ adviento _adios_ finregalo
+    rodolfo _operacionCompleja_ entrega _hola_ navidad 4 magos 3 nochebuena _adios_ finregalo
+    rodolfo _resultadoModulo2_ entrega 10 magos 3 finregalo
     
     
 cierracuento # }
