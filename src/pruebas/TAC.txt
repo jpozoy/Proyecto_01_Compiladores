@@ -1,211 +1,65 @@
-Parser y simbolos generados correctamente en: src/proyecto1
-_funcion_:
-int:_variableN1_=4
-int:_variableN2_=5
-int:_variableN3_=6
-t0=3+4
-return t0
-_funcionSuma_:
-_parametro1_=pop
-_parametro2_=pop
-t1=_parametro1_+_parametro2_
-return t1
-_funcionResta_:
-_parametro12_=pop
-_parametro23_=pop
-t2=_parametro1_+_parametro2_
-return t2
-string:_stringVariable_=Hola
-int:_hola_=4
-int:_adios_=7
-bool:_bool_=true
-t3=_hola_+_adios_
-int:_resultadoSuma_=t3
-t4=_hola_-_adios_
-int:_resultadoResta_=t4
-t5=_hola_/3
-int:_resultadoDivision_=t5
-t6=_hola_*5
-int:_resultadoMultiplicacion_=t6
-t7=10%3
-int:_resultadoModulo_=t7
-t8=_hola_^_adios_
-int:_resultadoPotencia_=t8
-push int:5
-push int:4
-call _funcionSuma_
-t9=$ret
-t10=_adios_+t9
-t11=3*t10
-t12=4%t11
-t13=_hola_+t12
-int:_operacionCompleja_=t13
-ifFalse true goto L1
-t14=5
-push t14
-print
-t15=1
-t16=_hola_+t15
-_hola_=t16
+_func1_:
+_x22_=pop
+float:_variable_=-0.01
+char:_miChar_=!
+char:_miChar2_=!
+int:_x30_=-1
+bool:_x40_=false
+char:_x50_=c
+t0=7<=45
+ifFalse t0 goto L1
+int:_y_
+_x22_=c
+char:_ch33_=a
 goto L0
 L1:
-string:_variableParaRead_=hola
-read t17
-_variableParaRead_=t17
-int:_variable_=0
+int:_y_
+string:_str2_=sdff
+L0:
+int:_j_=4
+int:_i_=0
+t1=4+_j_
+t2=_i_<t1
 L3:
-ifFalse true goto L2
-bool:_variableFor_=true
-t18=1
-t19=_hola_-t18
-_hola_=t19
-t20=1
-t21=_variable_+t20
-_variable_=t21
+ifFalse t2 goto L2
+t3=_i_
+push t3
+print
+t4=1
+t5=_i_+t4
+_i_=t5
 goto L3
 L2:
-L0:
-L4:
-ifFalse _bool_ goto L5
-t22=5
-push t22
+t6=Hola mundo
+push t6
 print
-t23=5
-push t23
-print
-t24=5
-push t24
-print
-t25=_hola_+_adios_
-int:_resultadoSuma_=t25
-t26=_hola_-_adios_
-int:_resultadoResta_=t26
-float:_variableswitch_=4.5
-L6:
-ifFalse _bool_ goto L7
-t27=5
-push t27
-print
-t28=5
-push t28
-print
-t29=5
-push t29
-print
-int:_hola_=4
-int:_adios_=7
-bool:_bool_=true
-t30=_hola_+_adios_
-int:_resultadoSuma_=t30
-t31=_hola_-_adios_
-int:_resultadoResta_=t31
-float:_variableswitch_=4.5
-goto L6
-L7:
-goto L4
-L5:
-bool:_pruebaConjuncion_=false
-call _funcion_
-t32=$ret
-t33=true&&true
-bool:_pruebaConjuncion_=t33
-t34=false||true
-bool:_pruebaDisyuncion_=t34
-t35=!true
-bool:_pruebaNegacion_=t35
-t36=3<5
-bool:_boolEjemplo9_=t36
-t37=_pruebaConjuncion_&&false
-bool:_boolEjemplo10_=t37
-_boolEjemplo10_=false
-int:_variableAsignacionPrueba_
-t38=4+5
-_variableAsignacionPrueba_=t38
-push int:56
-push int:78
-call _funcionSuma_
-t39=$ret
-int:_resultadoFuncionSuma_=t39
-t40=1
-t41=_resultadoSuma_+t40
-_resultadoSuma_=t41
-t42=_resultadoSuma_+3
-_resultadoSuma_=t42
-string:_stringParaPrueba_
-read t43
-_stringParaPrueba_=t43
-L8:
-ifFalse _bool_ goto L9
-t44=5
-push t44
-print
-int:_hola_=4
-goto L8
-L9:
-ifFalse true goto L11
-t45=5
-push t45
-print
-t46=1
-t47=_hola_+t46
-_hola_=t47
-goto L10
-L11:
-string:_variableParaRead_=hola
-read t48
-_variableParaRead_=t48
-L10:
-int:_variable_=0
-L13:
-ifFalse _bool_ goto L12
-bool:_variableFor_=true
-t49=1
-t50=_variable_+t49
-_variable_=t50
-goto L13
-L12:
-t51=1
-t52=_hola_+t51
-_hola_=t52
-L15:
-ifFalse false==true goto L16
-int:_dentroDeSwitch_=4
-t54=hola mundo
-push t54
-print
-goto L14
-L16:
-ifFalse true==true goto L17
-t56=chao mundo
-push t56
-print
-goto L14
-L17:
-t57=2
-push t57
-print
-L14:
-L19:
-ifFalse 3.4==4.5 goto L20
-int:_dentroDeSwitch_=4
-t59=hola mundo
-push t59
-print
-goto L18
-L20:
-ifFalse 1.2==4.5 goto L21
-t61=chao mundo
-push t61
-print
-goto L18
-L21:
-L18:
-t62=9+5
-int:_arregloInt_=newArray t62
-char:_g_=newArray 8
-_g_[0]=c
-_g_[1]=v
-_g_[2]=k
-t63=_arregloInt_[1]
-t64=_arregloInt_[0]
-_arregloInt_[1]=t64
+string:_stringPrueba_
+read t7
+_stringPrueba_=t7
+return -5.6
+_func2_:
+_b1_=pop
+_i1_=pop
+int:_variable12321_
+return
+_func3_:
+_sdfsdkhf_=pop
+return _b1_
+float:_fl1_
+float:_fl1_=56.6
+t8=7-15
+t9=6+t8
+t10=-14/t9
+t11=7-t10
+int:_in1_=t11
+t12=45.6%5.6
+t13=_fl1_+t12
+t14=3.7^t13
+float:_fl2_=t14
+t15=4.3^-0.005
+t16=4.5%t15
+_fl1_=t16
+t17=6.7!=8.9
+bool:_bl0_=t17
+int:_bl1_=5
+return _bl1_

@@ -20,22 +20,25 @@ import java.util.Scanner;
 
 
 public class Proyecto1 {
-public static void menu() throws FileNotFoundException {
-                Scanner scanner = new Scanner(System.in);
+    public static String tac = "";
+    public static String tablaSimbolos = "";
+    public static void menu() throws FileNotFoundException {
+        Scanner scanner = new Scanner(System.in);
         boolean continuar = true;
-
         while (continuar) {
             System.out.println("\nMenu Principal");
             System.out.println("1. Generar Lexer.java");
             System.out.println("2. Generar Parser.java y sym.java");
             System.out.println("3. Procesar archivo de entrada y escribir tokens");
             System.out.println("4. Eliminar archivos generados (Lexer,parser,sym)");
-            System.out.println("5. Analizar sintacticamente archivo en especifico ");
-            System.out.println("6. Analizar sintacticamente test.txt ( + rapido )");
-            System.out.println("7. Salir");
+            System.out.println("5. Analizar sintacticamente y semánticamente e imprimir tabla de simbolos");
+            System.out.println("6. Analizar sintacticamente y semánticamente e imprimir TAC (Código de tres direcciones)");
+            System.out.println("7. Analizar sintacticamente y semánticamente");
+            System.out.println("8. Salir");
             System.out.print("Seleccione una opcion: ");
 
-            String opcion = scanner.nextLine();
+            String opcion = "";
+            opcion = scanner.nextLine();
 
             switch (opcion) {
                 case "1":
@@ -61,10 +64,6 @@ public static void menu() throws FileNotFoundException {
                     break;
 
                 case "3":
-//                    System.out.print("Ingresa la ruta del archivo de entrada: ");
-//                    String rutaEntrada = scanner.nextLine();
-//                    System.out.print("Ingresa la ruta del archivo de salida: ");
-//                    String rutaSalida = scanner.nextLine();
                     try {
                         escribirTokens("src/proyecto1/test.txt", "src/pruebas/salida.txt");
                         System.out.println("Tokens procesados y guardados en " + "src/pruebas/salida.txt");
@@ -81,44 +80,30 @@ public static void menu() throws FileNotFoundException {
                     }
                     break;
                 case "5":
-                    System.out.print("Ingresa la ruta del archivo de entrada: ");
-                    String rutaEntradaParser = scanner.nextLine();
-                    try { 
-                        Reader file = new FileReader(rutaEntradaParser);
-                        Lexer lexer = new Lexer(file);
-                        parser parser = new parser(lexer);
-                        try {
-                            parser.parse();
-                        if (parser.syntaxErrors) {
-                            System.err.println("El archivo no puede ser generado por la gramatica.");
-                        } else {
-                            System.out.println("El archivo puede ser generado por la gramatica.");
-                        }
-                    }
-                    catch (Exception e){
-                        e.printStackTrace();
-                    }
-                    } catch (FileNotFoundException e) {
-                        System.out.println("Error: Archivo no encontrado.");
-                    }
-                case "6":
-                    Reader file = new FileReader("src/proyecto1/test.txt");
-                    Lexer lexer = new Lexer(file);
-                    parser parser = new parser(lexer);
                     try {
-                        
-                        parser.parse();
-                        if (parser.syntaxErrors) {
-                            System.err.println("El archivo no puede ser generado por la gramatica.");
-                        } else {
-                            System.out.println("El archivo puede ser generado por la gramatica.");
-                        }
+                        parse();
+                        System.out.println("Tabla de simbolos: \n" + tablaSimbolos);
                     }
                     catch (Exception e){
                         e.printStackTrace();
                     }
                     break;
+                case "6":
+                    try {
+                        parse();
+                        System.out.println("TAC: \n" + tac);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 case "7":
+                    try {
+                        parse();
+                    }
+                    catch (Exception e){
+                        e.printStackTrace();
+                    }
+                break;
+                case "8":
                     continuar = false;
             }
         }
@@ -126,27 +111,29 @@ public static void menu() throws FileNotFoundException {
         scanner.close();
     }
     public static void main(String[] args) throws FileNotFoundException {
-        generarArchivos();
-        Reader file = new FileReader("src/proyecto1/test.txt");
-        Lexer lexer = new Lexer(file);
-        parser parser = new parser(lexer);
-        try {                
+        menu();
+    }
+
+    public static void parse() {
+        tac = "";
+        tablaSimbolos = "";
+        try {
+            Reader file = new FileReader("src/proyecto1/test.txt");
+            Lexer lexer = new Lexer(file);
+            parser parser = new parser(lexer);
             parser.parse();
+            BufferedWriter writer = new BufferedWriter(new FileWriter("src/pruebas/TAC.txt"));
+            writer.write(tac);
+            writer.close();
             if (parser.syntaxErrors) {
                 System.err.println("El archivo no puede ser generado por la gramatica.");
             } else {
                 System.out.println("El archivo puede ser generado por la gramatica.");
             }
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-
-    public static void parse(Lexer lexer) {
-        parser parser = new parser(lexer);
-        try {
-            parser.parse();
+            if (parser.semanticErrors)
+                System.err.println("El archivo tiene errores semanticos.");
+            else
+                System.out.println("El archivo no tiene errores semanticos.");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -160,7 +147,6 @@ public static void menu() throws FileNotFoundException {
     try {
         //
         String outputDir = "src/proyecto1";
-
         // Ruta al archivo CUP
         File file = new File(path);
         if (!file.exists()) {

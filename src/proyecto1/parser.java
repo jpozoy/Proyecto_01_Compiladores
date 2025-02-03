@@ -766,6 +766,7 @@ public class parser extends java_cup.runtime.lr_parser {
     int tempCount = 0;
     int labelCount = 0;
     boolean commentTac = false;
+    boolean semanticErrors = false;
 
     String currentSwitchExpression = "";
     String currentSwitchLabel = "";
@@ -803,83 +804,95 @@ public class parser extends java_cup.runtime.lr_parser {
         tac += text + "\n";
     }
     private String evaluateComparator(String e1, String comparator, String e2) {
-        //System.out.println("E1: " + e1 + "Op:"+ comparator+" E2: " + e2);
-        if (e1 == null || e2 == null) 
-            throw new IllegalArgumentException("Cannot compare null values");
-        String temp = newTemp();
-        switch (comparator) {
-            case "==":
-                emit(temp + "=" + e1 + "==" + e2);
-                return temp;
-            case "!=":
-                emit(temp + "=" + e1 + "!=" + e2);
-                return temp;
-            case "<":
-                emit(temp + "=" + e1 + "<" + e2);
-                return temp;
-            case ">":
-                emit(temp + "=" + e1 + ">" + e2);
-                return temp;
-            case "<=":
-                emit(temp + "=" + e1 + "<=" + e2);
-                return temp;
-            case ">=":
-                emit(temp + "=" + e1 + ">=" + e2);
-                return temp;
-            default:
-                throw new IllegalArgumentException("Unknown comparator: " + comparator);
+        try {
+            if (e1 == null || e2 == null) 
+                emit("!!!!! ERROR !!!!! - Cannot compare null values");
+            String temp = newTemp();
+            switch (comparator) {
+                case "==":
+                    emit(temp + "=" + e1 + "==" + e2);
+                    return temp;
+                case "!=":
+                    emit(temp + "=" + e1 + "!=" + e2);
+                    return temp;
+                case "<":
+                    emit(temp + "=" + e1 + "<" + e2);
+                    return temp;
+                case ">":
+                    emit(temp + "=" + e1 + ">" + e2);
+                    return temp;
+                case "<=":
+                    emit(temp + "=" + e1 + "<=" + e2);
+                    return temp;
+                case ">=":
+                    emit(temp + "=" + e1 + ">=" + e2);
+                    return temp;
+                default:
+                    emit("!!!!! ERROR !!!!! - Unknown comparator: " + comparator);
+            }
+        } catch (Exception ex) {
+            emit("!!!!! ERROR !!!!! - Error evaluating comparator: " + ex.getMessage());
         }
+        return null;
     }
     private String evaluateArithmetic(String e1, String operator, String e2) {
-        //System.out.println("E1: " + e1 + "Op:"+ operator+" E2: " + e2);
-        if (e1 == null || e2 == null) 
-            throw new IllegalArgumentException("Cannot perform arithmetic operations with null values");
-        //if (commentTac) emit("// Performing " + e1 + " " + operator + " " + e2);
-        if (e1.matches("[a-zA-Z]+")) {
+        try {
+            if (e1 == null || e2 == null) 
+                emit("!!!!! ERROR !!!!! - Cannot perform arithmetic operations with null values");
+            if (e1.matches("[a-zA-Z]+")) {
+                String temp = newTemp();
+                emit(temp + "=" + e1);
+                e1 = temp;
+            }
+            if (e2.matches("[a-zA-Z]+")) {
+                String temp = newTemp();
+                emit(temp + "=" + e2);
+                e2 = temp;
+            }
             String temp = newTemp();
-            emit(temp + "=" + e1);
-            e1 = temp;
+            switch (operator) {
+                case "+":
+                    emit(temp + "=" + e1 + "+" + e2);
+                    return temp;
+                case "-":
+                    emit(temp + "=" + e1 + "-" + e2);
+                    return temp;
+                case "*":
+                    emit(temp + "=" + e1 + "*" + e2);
+                    return temp;
+                case "/":
+                    emit(temp + "=" + e1 + "/" + e2);
+                    return temp;
+                case "%":
+                    emit(temp + "=" + e1 + "%" + e2);
+                    return temp;
+                case "^":
+                    emit(temp + "=" + e1 + "^" + e2);
+                    return temp;
+                default:
+                    emit("!!!!! ERROR !!!!! - Unknown arithmetic operator: " + operator);
+            }
+        } catch (Exception ex) {
+            emit("!!!!! ERROR !!!!! - Error evaluating arithmetic: " + ex.getMessage());
         }
-        if (e2.matches("[a-zA-Z]+")) {
-            String temp = newTemp();
-            emit(temp + "=" + e2);
-            e2 = temp;
-        }
-        String temp = newTemp();
-        switch (operator) {
-            case "+":
-                emit(temp + "=" + e1 + "+" + e2);
-                return temp;
-            case "-":
-                emit(temp + "=" + e1 + "-" + e2);
-                return temp;
-            case "*":
-                emit(temp + "=" + e1 + "*" + e2);
-                return temp;
-            case "/":
-                emit(temp + "=" + e1 + "/" + e2);
-                return temp;
-            case "%":
-                emit(temp + "=" + e1 + "%" + e2);
-                return temp;
-            case "^":
-                emit(temp + "=" + e1 + "^" + e2);
-                return temp;
-            default:
-                throw new IllegalArgumentException("Unknown arithmetic operator: " + operator);
-        }
+        return null;
     }
-    // Método auxiliar para obtener el tipo
     private String getType(String expression) {
-        //System.out.println("Expression: " + expression);
-        return expression.split(":")[0];
+        try {
+            return expression.split(":")[0];
+        } catch (Exception ex) {
+            emit("!!!!! ERROR !!!!! - Error getting type: " + ex.getMessage());
+        }
+        return null;
     }
     private String getValue(String expression) {
-        //System.out.println("Expression: " + expression);
-        return expression.toString().split(":")[1];
+        try {
+            return expression.toString().split(":")[1];
+        } catch (Exception ex) {
+            emit("!!!!! ERROR !!!!! - Error getting value " + expression +" : " + ex.getMessage());
+        }
+        return null;
     }
-    
-    
 
 
 /** Cup generated class to encapsulate user supplied action code.*/
@@ -988,15 +1001,26 @@ class CUP$parser$actions {
 		int idright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)).right;
 		Object id = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-1)).value;
 		 
-                        Simbolo simbolo = TablaSimbolos.buscar(id.toString());
-                        if (simbolo == null) 
-                            throw new IllegalArgumentException("ID " + id.toString() + " not found.");
-                        if (simbolo.getValue() == null)
-                            throw new IllegalArgumentException("ID " + id.toString() + " is empty. Value needed for unary operation.");
-                        if (!(simbolo.type.equals("int"))) 
-                            throw new IllegalArgumentException("ID " + id.toString() + " is not an integer. Unary operation only allowed for integers.");
-                        RESULT = "int:"+id.toString()+":"+id.toString()+":+";
-                    
+               try {
+                Simbolo simbolo = TablaSimbolos.buscar(id.toString());
+                if (simbolo == null) {
+                    emit("!!!!! ERROR !!!!! - ID " + id.toString() + " not found. Line: " + idleft);
+                    semanticErrors = true;
+                }
+                if (simbolo.getValue() == null) {
+                    emit("!!!!! ERROR !!!!! - ID " + id.toString() + " is empty. Value needed for unary operation. Line: " + idleft);
+                    semanticErrors = true;
+                }
+                if (!(simbolo.type.equals("int"))) {
+                    emit("!!!!! ERROR !!!!! - ID " + id.toString() + " is not an integer. Unary operation only allowed for integers. Line: " + idleft);
+                    semanticErrors = true;
+                }
+                RESULT = "int:"+id.toString()+":"+id.toString()+":+";
+               } catch (Exception e) {
+                emit("!!!!! ERROR !!!!! - Error in unary operation: " + e.getMessage() + ". Line: " + idleft);
+                semanticErrors = true;
+               }
+              
               CUP$parser$result = parser.getSymbolFactory().newSymbol("unary_operation",17, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1009,18 +1033,28 @@ class CUP$parser$actions {
 		int idright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)).right;
 		Object id = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-1)).value;
 		 
-                        Simbolo simbolo = TablaSimbolos.buscar(id.toString());
-                        if (simbolo == null) 
-                            throw new IllegalArgumentException("ID " + id.toString() + " not found.");
-                        if (simbolo.getValue() == null) 
-                            throw new IllegalArgumentException("ID " + id.toString() + " is empty. Value needed for unary operation.");
-                        try {
-                            Integer.parseInt(simbolo.getValue());
-                        } catch (Exception e) {
-                            throw new IllegalArgumentException("ID " + id.toString() + " is not an integer. Unary operation only allowed for integers.");
-                        }
-                        RESULT = "int:"+id.toString()+":"+id.toString()+":-";
-                    
+               try {
+                Simbolo simbolo = TablaSimbolos.buscar(id.toString());
+                if (simbolo == null) {
+                    emit("!!!!! ERROR !!!!! - ID " + id.toString() + " not found. Line: " + idleft);
+                    semanticErrors = true;
+                }
+                if (simbolo.getValue() == null) {
+                    emit("!!!!! ERROR !!!!! - ID " + id.toString() + " is empty. Value needed for unary operation. Line: " + idleft);
+                    semanticErrors = true;
+                }
+                try {
+                    Integer.parseInt(simbolo.getValue());
+                } catch (Exception e) {
+                    emit("!!!!! ERROR !!!!! - ID " + id.toString() + " is not an integer. Unary operation only allowed for integers. Line: " + idleft);
+                    semanticErrors = true;
+                }
+                RESULT = "int:"+id.toString()+":"+id.toString()+":-";
+               } catch (Exception e) {
+                emit("!!!!! ERROR !!!!! - Error in unary operation: " + e.getMessage() + ". Line: " + idleft);
+                semanticErrors = true;
+               }
+              
               CUP$parser$result = parser.getSymbolFactory().newSymbol("unary_operation",17, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1141,10 +1175,18 @@ class CUP$parser$actions {
 		int idright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object id = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
 		
-            Simbolo simbolo = TablaSimbolos.buscar(id.toString());
-            if (simbolo == null) 
-                throw new IllegalArgumentException("ID " + id.toString() + " not found. Here"); 
-            RESULT = simbolo.type.toString() + ":" + id.toString(); 
+         try {
+          Simbolo simbolo = TablaSimbolos.buscar(id.toString());
+          if (simbolo == null) {
+              emit("!!!!! ERROR !!!!! - ID " + id.toString() + " not found. Line: " + idleft);
+              semanticErrors = true;
+          }
+          RESULT = simbolo.type.toString() + ":" + id.toString();
+         } catch (Exception e) {
+          emit("!!!!! ERROR !!!!! - Error in literal: " + e.getMessage() + ". Line: " + idleft);
+          semanticErrors = true;
+         }
+         
               CUP$parser$result = parser.getSymbolFactory().newSymbol("literal",29, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1156,7 +1198,14 @@ class CUP$parser$actions {
 		int ileft = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
 		int iright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object i = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
-		RESULT = "int:" + i.toString();
+		
+            try {
+                RESULT = "int:" + i.toString();
+            } catch (Exception ex) {
+                emit("!!!!! ERROR !!!!! - Error processing integer value: " + ex.getMessage() + ". Line: " + ileft);
+                semanticErrors = true;
+            }
+         
               CUP$parser$result = parser.getSymbolFactory().newSymbol("literal",29, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1168,7 +1217,14 @@ class CUP$parser$actions {
 		int fleft = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
 		int fright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object f = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
-		RESULT = "float:" + f.toString();
+		
+            try {
+                RESULT = "float:" + f.toString();
+            } catch (Exception ex) {
+                emit("!!!!! ERROR !!!!! - Error processing float value: " + ex.getMessage() + ". Line: " + fleft);
+                semanticErrors = true;
+            }
+         
               CUP$parser$result = parser.getSymbolFactory().newSymbol("literal",29, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1180,7 +1236,14 @@ class CUP$parser$actions {
 		int bleft = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
 		int bright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object b = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
-		RESULT = "bool:" + b.toString();
+		
+            try {
+                RESULT = "bool:" + b.toString();
+            } catch (Exception ex) {
+                emit("!!!!! ERROR !!!!! - Error processing boolean value: " + ex.getMessage() + ". Line: " + bleft);
+                semanticErrors = true;
+            }
+         
               CUP$parser$result = parser.getSymbolFactory().newSymbol("literal",29, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1192,7 +1255,14 @@ class CUP$parser$actions {
 		int cleft = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
 		int cright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object c = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
-		RESULT = "char:" + c.toString();
+		
+            try {
+                RESULT = "char:" + c.toString();
+            } catch (Exception ex) {
+                emit("!!!!! ERROR !!!!! - Error processing char value: " + ex.getMessage() + ". Line: " + cleft);
+                semanticErrors = true;
+            }
+         
               CUP$parser$result = parser.getSymbolFactory().newSymbol("literal",29, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1204,7 +1274,14 @@ class CUP$parser$actions {
 		int sleft = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
 		int sright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object s = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
-		RESULT = "string:" + s.toString();
+		
+            try {
+                RESULT = "string:" + s.toString();
+            } catch (Exception ex) {
+                emit("!!!!! ERROR !!!!! - Error processing string value: " + ex.getMessage() + ". Line: " + sleft);
+                semanticErrors = true;
+            }
+         
               CUP$parser$result = parser.getSymbolFactory().newSymbol("literal",29, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1216,7 +1293,14 @@ class CUP$parser$actions {
 		int ileft = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
 		int iright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object i = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
-		RESULT = i.toString();
+		
+    try {
+        RESULT = i.toString();
+    } catch (Exception e) {
+        emit("!!!!! ERROR !!!!! - Error in expression: " + e.getMessage() + ". Line: " + ileft);
+        semanticErrors = true;
+    }
+    
               CUP$parser$result = parser.getSymbolFactory().newSymbol("expression",16, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1228,7 +1312,14 @@ class CUP$parser$actions {
 		int eleft = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)).left;
 		int eright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)).right;
 		Object e = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-1)).value;
-		RESULT = e.toString();
+		
+        try {
+            RESULT = e.toString();
+        } catch (Exception ex) {
+            emit("!!!!! ERROR !!!!! - Error in expression: " + ex.getMessage() + ". Line: " + eleft);
+            semanticErrors = true;
+        }
+    
               CUP$parser$result = parser.getSymbolFactory().newSymbol("expression",16, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1247,16 +1338,25 @@ class CUP$parser$actions {
 		int e2right = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object e2 = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
 		
-            if (commentTac) emit("// Performing " + e1.toString() + " " + o.toString() + " " + e2.toString());
-            String e1Type = getType(e1.toString());
-            String e2Type = getType(e2.toString());
-            if (e1Type.equals("int") && e2Type.equals("int")) 
-                RESULT = "int:"+evaluateArithmetic(getValue(e1.toString()), o.toString(), getValue(e2.toString()));
-            else if (e1Type.equals("float") && e2Type.equals("float"))
-                RESULT = "float:"+evaluateArithmetic(getValue(e1.toString()), o.toString(), getValue(e2.toString())); 
-            else 
-                throw new IllegalArgumentException("Incompatible types for arithmetic operations, only integer-integer and float-float are allowed.");
-            
+         try {
+          if (commentTac) emit("// Performing " + e1.toString() + " " + o.toString() + " " + e2.toString());
+          String e1Type = getType(e1.toString());
+          String e2Type = getType(e2.toString());
+          if (e1Type.equals("int") && e2Type.equals("int")) 
+              RESULT = "int:"+evaluateArithmetic(getValue(e1.toString()), o.toString(), getValue(e2.toString()));
+          else if (e1Type.equals("float") && e2Type.equals("float"))
+              RESULT = "float:"+evaluateArithmetic(getValue(e1.toString()), o.toString(), getValue(e2.toString())); 
+          else {
+              emit("!!!!! ERROR !!!!! - Incompatible types for arithmetic operations, only integer-integer and float-float are allowed. Line: " + e1left);
+              emit("e1: " + e1.toString() + " e2: " + e2.toString());
+              emit("------------------------------");
+              semanticErrors = true;
+          }
+         } catch (Exception ex) {
+          emit("!!!!! ERROR !!!!! - Error in arithmetic expression: " + ex.getMessage() + ". Line: " + e1left);
+          semanticErrors = true;
+         }
+         
               CUP$parser$result = parser.getSymbolFactory().newSymbol("expression",16, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1269,25 +1369,31 @@ class CUP$parser$actions {
 		int oright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object o = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
 		
-                String[] parts = o.toString().split(":");
-                String id = parts[1];
-                String operation = parts[3];
-                if (operation.equals("+")) {
-                    if (commentTac) emit("Incrementing " + id + " by 1");
-                    String temp1 = newTemp();
-                    emit(temp1 + "=1");
-                    String temp2 = newTemp();
-                    emit(temp2 + "=" + id + "+" + temp1);
-                    emit(id + "=" + temp2);
-                } else {
-                    if (commentTac) emit("Decrementing " + id + " by 1");
-                    String temp1 = newTemp();
-                    emit(temp1 + "=1");
-                    String temp2 = newTemp();
-                    emit(temp2 + "=" + id + "-" + temp1);
-                    emit(id + "=" + temp2);
-                }
-            RESULT = o.toString();
+          try {
+              String[] parts = o.toString().split(":");
+              String id = parts[1];
+              String operation = parts[3];
+              if (operation.equals("+")) {
+               if (commentTac) emit("Incrementing " + id + " by 1");
+               String temp1 = newTemp();
+               emit(temp1 + "=1");
+               String temp2 = newTemp();
+               emit(temp2 + "=" + id + "+" + temp1);
+               emit(id + "=" + temp2);
+              } else {
+               if (commentTac) emit("Decrementing " + id + " by 1");
+               String temp1 = newTemp();
+               emit(temp1 + "=1");
+               String temp2 = newTemp();
+               emit(temp2 + "=" + id + "-" + temp1);
+               emit(id + "=" + temp2);
+              }
+              RESULT = o.toString();
+          } catch (Exception ex) {
+              emit("!!!!! ERROR !!!!! - Error in unary operation: " + ex.getMessage() + ". Line: " + oleft);
+              semanticErrors = true;
+          }
+         
               CUP$parser$result = parser.getSymbolFactory().newSymbol("expression",16, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1299,7 +1405,14 @@ class CUP$parser$actions {
 		int fleft = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
 		int fright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object f = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
-		RESULT = f.toString();
+		
+            try {
+                RESULT = f.toString();
+            } catch (Exception ex) {
+                emit("!!!!! ERROR !!!!! - Error in function call: " + ex.getMessage() + ". Line: " + fleft);
+                semanticErrors = true;
+            }
+         
               CUP$parser$result = parser.getSymbolFactory().newSymbol("expression",16, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1318,14 +1431,24 @@ class CUP$parser$actions {
 		int e2right = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object e2 = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
 		 
-                if (commentTac) emit("// Comparing " + e1.toString() + " " + c.toString() + " " + e2.toString());
-                String e1Type = getType(e1.toString());
-                String e2Type = getType(e2.toString());
-                if ((e1Type.equals("int") && e2Type.equals("int") || (e1Type.equals("float") && e2Type.equals("float")))) 
-                    RESULT = "bool:"+evaluateComparator(getValue(e1.toString()), c.toString(), getValue(e2.toString())); 
-                else 
-                    throw new IllegalArgumentException("Incompatible types for comparison operations, only integer-integer and float-float are allowed.");
-            
+          try {
+              if (commentTac) emit("// Comparing " + e1.toString() + " " + c.toString() + " " + e2.toString());
+              String e1Type = getType(e1.toString());
+              String e2Type = getType(e2.toString());
+              if ((e1Type.equals("int") && e2Type.equals("int") || (e1Type.equals("float") && e2Type.equals("float")))) 
+
+               RESULT = "bool:"+evaluateComparator(getValue(e1.toString()), c.toString(), getValue(e2.toString())); 
+              else {
+               emit("!!!!! ERROR !!!!! - Incompatible types for comparison operations, only integer-integer and float-float are allowed. Line: " + e1left);
+               emit("e1: " + e1 + " e2: " + e2);
+               emit("------------------------------");
+               semanticErrors = true;
+              }
+          } catch (Exception ex) {
+              emit("!!!!! ERROR !!!!! - Error in comparison expression: " + ex.getMessage() + ". Line: " + e1left);
+              semanticErrors = true;
+          }
+         
               CUP$parser$result = parser.getSymbolFactory().newSymbol("expression",16, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1341,17 +1464,23 @@ class CUP$parser$actions {
 		int e2right = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object e2 = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
 		
-                if (commentTac) emit("// Performing " + e1.toString() + " AND " + e2.toString());
-                String e1Type = getType(e1.toString());
-                String e2Type = getType(e2.toString());
-                if (e1Type.equals("bool") && e2Type.equals("bool")) {
-                    String temp = newTemp();
-                    emit(temp + "=" + getValue(e1.toString()) + "&&" + getValue(e2.toString()));
-                    RESULT = "bool:" + temp;
-                } else {
-                    throw new IllegalArgumentException("Incompatible types for AND operation, only boolean-boolean is allowed.");
-                }
-            
+          try {
+              if (commentTac) emit("// Performing " + e1.toString() + " AND " + e2.toString());
+              String e1Type = getType(e1.toString());
+              String e2Type = getType(e2.toString());
+              if (e1Type.equals("bool") && e2Type.equals("bool")) {
+               String temp = newTemp();
+               emit(temp + "=" + getValue(e1.toString()) + "&&" + getValue(e2.toString()));
+               RESULT = "bool:" + temp;
+              } else {
+               emit("!!!!! ERROR !!!!! - Incompatible types for AND operation, only boolean-boolean is allowed. Line: " + e1left);
+               semanticErrors = true;
+              }
+          } catch (Exception ex) {
+              emit("!!!!! ERROR !!!!! - Error in AND expression: " + ex.getMessage() + ". Line: " + e1left);
+              semanticErrors = true;
+          }
+         
               CUP$parser$result = parser.getSymbolFactory().newSymbol("expression",16, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1367,17 +1496,23 @@ class CUP$parser$actions {
 		int e2right = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object e2 = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
 		
-                if (commentTac) emit("// Performing " + e1.toString() + " OR " + e2.toString());
-                String e1Type = getType(e1.toString());
-                String e2Type = getType(e2.toString());
-                if (e1Type.equals("bool") && e2Type.equals("bool")) {
-                    String temp = newTemp();
-                    emit(temp + "=" + getValue(e1.toString()) + "||" + getValue(e2.toString()));
-                    RESULT = "bool:" + temp;
-                } else {
-                    throw new IllegalArgumentException("Incompatible types for OR operation, only boolean-boolean is allowed.");
-                }
-            
+          try {
+              if (commentTac) emit("// Performing " + e1.toString() + " OR " + e2.toString());
+              String e1Type = getType(e1.toString());
+              String e2Type = getType(e2.toString());
+              if (e1Type.equals("bool") && e2Type.equals("bool")) {
+               String temp = newTemp();
+               emit(temp + "=" + getValue(e1.toString()) + "||" + getValue(e2.toString()));
+               RESULT = "bool:" + temp;
+              } else {
+               emit("!!!!! ERROR !!!!! - Incompatible types for OR operation, only boolean-boolean is allowed. Line: " + e1left);
+               semanticErrors = true;
+              }
+          } catch (Exception ex) {
+              emit("!!!!! ERROR !!!!! - Error in OR expression: " + ex.getMessage() + ". Line: " + e1left);
+              semanticErrors = true;
+          }
+         
               CUP$parser$result = parser.getSymbolFactory().newSymbol("expression",16, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1390,16 +1525,22 @@ class CUP$parser$actions {
 		int eright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object e = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
 		
-                if (commentTac) emit("// Performing NOT " + e.toString());
-                String eType = getType(e.toString());
-                if (eType.equals("bool")) {
-                    String temp = newTemp(); 
-                    emit(temp + "=!" + getValue(e.toString()));
-                    RESULT = "bool:" + temp;
-                } else {
-                    throw new IllegalArgumentException("Incompatible type for NOT operation, only boolean is allowed.");
-                }
-            
+          try {
+              if (commentTac) emit("// Performing NOT " + e.toString());
+              String eType = getType(e.toString());
+              if (eType.equals("bool")) {
+               String temp = newTemp(); 
+               emit(temp + "=!" + getValue(e.toString()));
+               RESULT = "bool:" + temp;
+              } else {
+               emit("!!!!! ERROR !!!!! - Incompatible type for NOT operation, only boolean is allowed. Line: " + eleft);
+               semanticErrors = true;
+              }
+          } catch (Exception ex) {
+              emit("!!!!! ERROR !!!!! - Error in NOT expression: " + ex.getMessage() + ". Line: " + eleft);
+              semanticErrors = true;
+          }
+         
               CUP$parser$result = parser.getSymbolFactory().newSymbol("expression",16, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1411,7 +1552,14 @@ class CUP$parser$actions {
 		int aleft = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
 		int aright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object a = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
-		RESULT = a.toString();
+		
+          try {
+              RESULT = a.toString();
+          } catch (Exception ex) {
+              emit("!!!!! ERROR !!!!! - Error in array access: " + ex.getMessage() + ". Line: " + aleft);
+              semanticErrors = true;
+          }
+         
               CUP$parser$result = parser.getSymbolFactory().newSymbol("expression",16, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1505,25 +1653,31 @@ class CUP$parser$actions {
 		int oright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object o = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
  // Ya
-                String[] parts = o.toString().split(":");
-                String id = parts[1];
-                String operation = parts[3];
-                if (operation.equals("+")) {
-                    if (commentTac) emit("// Incrementing " + id + " by 1");
-                    String temp1 = newTemp();
-                    emit(temp1 + "=1");
-                    String temp2 = newTemp();
-                    emit(temp2 + "=" + id + "+" + temp1);
-                    emit(id + "=" + temp2);
-                } else {
-                    if (commentTac) emit("// Decrementing " + id + " by 1");
-                    String temp1 = newTemp();
-                    emit(temp1 + "=1");
-                    String temp2 = newTemp();
-                    emit(temp2 + "=" + id + "-" + temp1);
-                    emit(id + "=" + temp2);
+                try {
+                    String[] parts = o.toString().split(":");
+                    String id = parts[1];
+                    String operation = parts[3];
+                    if (operation.equals("+")) {
+                        if (commentTac) emit("// Incrementing " + id + " by 1");
+                        String temp1 = newTemp();
+                        emit(temp1 + "=1");
+                        String temp2 = newTemp();
+                        emit(temp2 + "=" + id + "+" + temp1);
+                        emit(id + "=" + temp2);
+                    } else {
+                        if (commentTac) emit("// Decrementing " + id + " by 1");
+                        String temp1 = newTemp();
+                        emit(temp1 + "=1");
+                        String temp2 = newTemp();
+                        emit(temp2 + "=" + id + "-" + temp1);
+                        emit(id + "=" + temp2);
+                    }
+                    RESULT = o.toString();
+                } catch (Exception ex) {
+                    emit("!!!!! ERROR !!!!! - Error in unary operation: " + ex.getMessage() + ". Line: " + oleft);
+                    semanticErrors = true;
                 }
-            RESULT = o.toString();
+            
               CUP$parser$result = parser.getSymbolFactory().newSymbol("NT$0",36, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1696,13 +1850,22 @@ TablaSimbolos.abrirScope();
 		int eright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)).right;
 		Object e = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-1)).value;
 		
-                        Simbolo simbolo = TablaSimbolos.buscar(id.toString());
-                        if (simbolo == null) 
-                            System.err.println("ID " + id.toString() + " not found.");
-                        if (!simbolo.type.equals(getType(e.toString())))
-                            throw new IllegalArgumentException("ID " + id.toString() + " is not of type " + getType(e.toString()) + ". Value assigned has to be of the same type.");
-                        simbolo.setValue(getValue(e.toString()));
-                        emit(id.toString() + "=" + getValue(e.toString()));
+                        try {
+                            Simbolo simbolo = TablaSimbolos.buscar(id.toString());
+                            if (simbolo == null) {
+                                emit("!!!!! ERROR !!!!! - ID " + id.toString() + " not found. Line: " + idleft);
+                                semanticErrors = true;
+                            }
+                            if (!simbolo.type.equals(getType(e.toString()))) {
+                                emit("!!!!! ERROR !!!!! - ID " + id.toString() + " is not of type " + getType(e.toString()) + ". Value assigned has to be of the same type. Line: " + idleft);
+                                semanticErrors = true;
+                            }
+                            simbolo.setValue(getValue(e.toString()));
+                            emit(id.toString() + "=" + getValue(e.toString()));
+                        } catch (Exception ex) {
+                            emit("!!!!! ERROR !!!!! - Error in value assignment: " + ex.getMessage() + ". Line: " + idleft);
+                            semanticErrors = true;
+                        }
                     
               CUP$parser$result = parser.getSymbolFactory().newSymbol("value_assignment",30, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-3)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
@@ -1719,11 +1882,17 @@ TablaSimbolos.abrirScope();
 		int idVarright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)).right;
 		Object idVar = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-1)).value;
 		
-                        if (commentTac) emit("// Variable " + idVar.toString() + " declaration");
-                        Simbolo simbolo = new Simbolo(idVar.toString(),typeVar.toString(),idVarleft,idVarright);
-                        TablaSimbolos.agregarSimbolo(simbolo);
-                        emit(typeVar.toString() + ":" +idVar.toString());
-                        RESULT=""+typeVar.toString()+":"+idVar.toString();
+                        try {
+                            if (commentTac) emit("// Variable " + idVar.toString() + " declaration");
+                            Simbolo simbolo = new Simbolo(idVar.toString(),typeVar.toString(),idVarleft,idVarright);
+                            TablaSimbolos.agregarSimbolo(simbolo);
+                            emit(typeVar.toString() + ":" +idVar.toString());
+                            RESULT=""+typeVar.toString()+":"+idVar.toString();
+                        } catch (Exception ex) {
+                            emit("!!!!! ERROR !!!!! - Error in variable declaration: " + ex.getMessage() + ". Line: " + idVarleft);
+                            semanticErrors = true;
+                        }
+                    
               CUP$parser$result = parser.getSymbolFactory().newSymbol("variable_declaration",20, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1742,12 +1911,18 @@ TablaSimbolos.abrirScope();
 		int eright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)).right;
 		Object e = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-1)).value;
 		
+                        try {
                             if (commentTac) emit("// Variable " + idVar.toString() + " declaration with value");
-                          Simbolo simbolo = new Simbolo(idVar.toString(),typeVar.toString(),idVarleft,idVarright);
-                          simbolo.setValue(getValue(e.toString()));
-                          TablaSimbolos.agregarSimbolo(simbolo);
-                          emit(typeVar.toString() + ":" +idVar.toString() + "=" + getValue(e.toString()));
+                            Simbolo simbolo = new Simbolo(idVar.toString(),typeVar.toString(),idVarleft,idVarright);
+                            simbolo.setValue(getValue(e.toString()));
+                            TablaSimbolos.agregarSimbolo(simbolo);
+                            emit(typeVar.toString() + ":" +idVar.toString() + "=" + getValue(e.toString()));
                             RESULT=""+typeVar.toString()+":"+idVar.toString();
+                        } catch (Exception ex) {
+                            emit("!!!!! ERROR !!!!! - Error in variable declaration with value: " + ex.getMessage() + ". Line: " + idVarleft);
+                            semanticErrors = true;
+                        }
+                    
               CUP$parser$result = parser.getSymbolFactory().newSymbol("variable_declaration",20, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-4)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1766,23 +1941,27 @@ TablaSimbolos.abrirScope();
 		int pright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)).right;
 		Object p = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-2)).value;
 
-                            if (commentTac) emit("// Function " + idVar.toString() + " declaration");
-                            Simbolo simbolo = new Simbolo(idVar.toString(),typeVar.toString(),idVarleft,idVarright);
-                            simbolo.setFunction(typeVar.toString(), TablaSimbolos.getParametrosEnEspera());
-                            TablaSimbolos.limpiarParametrosEnEspera();
-                            TablaSimbolos.agregarSimbolo(simbolo);
-                            String functionLabel = idVar.toString();
-                            emit(functionLabel + ":");
-                            String[] parameters = p.toString().split(",");
                             try {
-                                for (String parameter: parameters) {
-                                    emit (getValue(parameter) + "=pop");
+                                if (commentTac) emit("// Function " + idVar.toString() + " declaration");
+                                Simbolo simbolo = new Simbolo(idVar.toString(),typeVar.toString(),idVarleft,idVarright);
+                                simbolo.setFunction(typeVar.toString(), TablaSimbolos.getParametrosEnEspera());
+                                TablaSimbolos.limpiarParametrosEnEspera();
+                                TablaSimbolos.agregarSimbolo(simbolo);
+                                String functionLabel = idVar.toString();
+                                emit(functionLabel + ":");
+                                String[] parameters = p.toString().split(",");
+                                try {
+                                    for (String parameter: parameters) {
+                                        emit (getValue(parameter) + "=pop");
+                                    }
+                                } catch (Exception e) {
+                                    emit("!!!!! ERROR !!!!! - Error while processing function parameters: " + e.getMessage() + ". Line: " + idVarleft);
+                                    semanticErrors = true;
                                 }
-                            } catch (Exception e) {
-                                //throw new IllegalArgumentException("Error while processing function parameters.");
+                            } catch (Exception ex) {
+                                emit("!!!!! ERROR !!!!! - Error in function declaration: " + ex.getMessage() + ". Line: " + idVarleft);
+                                semanticErrors = true;
                             }
-
-
                         
               CUP$parser$result = parser.getSymbolFactory().newSymbol("NT$2",38, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
@@ -1819,10 +1998,15 @@ TablaSimbolos.abrirScope();
 		int idVarright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object idVar = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
 		
-                Simbolo simbolo = new Simbolo(idVar.toString(),typeVar.toString(),idVarleft,idVarright);
-                TablaSimbolos.agregarParametroEnEspera(simbolo);
-                TablaSimbolos.agregarSimbolo(simbolo);
-                RESULT = typeVar.toString() + ":" + idVar.toString();
+                try {
+                    Simbolo simbolo = new Simbolo(idVar.toString(),typeVar.toString(),idVarleft,idVarright);
+                    TablaSimbolos.agregarParametroEnEspera(simbolo);
+                    TablaSimbolos.agregarSimbolo(simbolo);
+                    RESULT = typeVar.toString() + ":" + idVar.toString();
+                } catch (Exception ex) {
+                    emit("!!!!! ERROR !!!!! - Error in parameter declaration: " + ex.getMessage() + ". Line: " + idVarleft);
+                    semanticErrors = true;
+                }
             
               CUP$parser$result = parser.getSymbolFactory().newSymbol("parameters",23, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
@@ -1842,10 +2026,15 @@ TablaSimbolos.abrirScope();
 		int pright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object p = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
 		
-                Simbolo simbolo = new Simbolo(idVar.toString(),typeVar.toString(),idVarleft,idVarright);
-                TablaSimbolos.agregarParametroEnEspera(simbolo);
-                TablaSimbolos.agregarSimbolo(simbolo);
-                RESULT = typeVar.toString() + ":" + idVar.toString() + "," + p.toString();
+                try {
+                    Simbolo simbolo = new Simbolo(idVar.toString(),typeVar.toString(),idVarleft,idVarright);
+                    TablaSimbolos.agregarParametroEnEspera(simbolo);
+                    TablaSimbolos.agregarSimbolo(simbolo);
+                    RESULT = typeVar.toString() + ":" + idVar.toString() + "," + p.toString();
+                } catch (Exception ex) {
+                    emit("!!!!! ERROR !!!!! - Error in parameter declaration: " + ex.getMessage() + ". Line: " + idVarleft);
+                    semanticErrors = true;
+                }
             
               CUP$parser$result = parser.getSymbolFactory().newSymbol("parameters",23, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-3)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
@@ -1871,20 +2060,31 @@ TablaSimbolos.abrirScope();
 		int argsright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)).right;
 		Object args = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-1)).value;
 		 
-                    if (commentTac) emit("// Calling function " + id.toString() + " with arguments " + args.toString() + "--------------");
-                    Simbolo simbolo = TablaSimbolos.buscar(id.toString());
-                    if (simbolo == null) 
-                        throw new IllegalArgumentException("ID " + id.toString() + " not found.");
-                    if (!simbolo.isFunction())
-                        throw new IllegalArgumentException("ID " + id.toString() + " is not a function.");
-                    int arguments = args.toString().isEmpty() ? 0 : args.toString().split(",").length;
-                    if (arguments != simbolo.getParameters().size())
-                        throw new IllegalArgumentException("Function " + id.toString() + " expects " + simbolo.getParameters().size() + " arguments, but " + args.toString().split(",").length + " were provided.");
-                    String temp = newTemp(); 
-                    emit("call " + id.toString());
-                    emit(temp + "=$ret"); 
-                    RESULT = simbolo.returnType+":"+temp; 
-                  
+                    try {
+                        if (commentTac) emit("// Calling function " + id.toString() + " with arguments " + args.toString() + "--------------");
+                        Simbolo simbolo = TablaSimbolos.buscar(id.toString());
+                        if (simbolo == null) {
+                            emit("!!!!! ERROR !!!!! - ID " + id.toString() + " not found. Line: " + idleft);
+                            semanticErrors = true;
+                        }
+                        if (!simbolo.isFunction()) {
+                            emit("!!!!! ERROR !!!!! - ID " + id.toString() + " is not a function. Line: " + idleft);
+                            semanticErrors = true;
+                        }
+                        int arguments = args.toString().isEmpty() ? 0 : args.toString().split(",").length;
+                        if (arguments != simbolo.getParameters().size()) {
+                            emit("!!!!! ERROR !!!!! - Function " + id.toString() + " expects " + simbolo.getParameters().size() + " arguments, but " + args.toString().split(",").length + " were provided. Line: " + idleft);
+                            semanticErrors = true;
+                        }
+                        String temp = newTemp(); 
+                        emit("call " + id.toString());
+                        emit(temp + "=$ret"); 
+                        RESULT = simbolo.returnType+":"+temp; 
+                    } catch (Exception ex) {
+                        emit("!!!!! ERROR !!!!! - Error in function call: " + ex.getMessage() + ". Line: " + idleft);
+                        semanticErrors = true;
+                    }
+                    
               CUP$parser$result = parser.getSymbolFactory().newSymbol("function_call",22, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-3)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1897,8 +2097,14 @@ TablaSimbolos.abrirScope();
 		int eright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object e = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
 		
-            emit("push " + e.toString());
-            RESULT=e;
+                try {
+                    emit("push " + e.toString());
+                    RESULT = e;
+                } catch (Exception ex) {
+                    emit("!!!!! ERROR !!!!! - Error in arguments: " + ex.getMessage() + ". Line: " + eleft);
+                    semanticErrors = true;
+                }
+            
               CUP$parser$result = parser.getSymbolFactory().newSymbol("arguments",24, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1914,8 +2120,13 @@ TablaSimbolos.abrirScope();
 		int aright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object a = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
 		
-            emit("push " + e.toString());
-            RESULT = e.toString() + "," + a.toString();
+                try {
+                    emit("push " + e.toString());
+                    RESULT = e.toString() + "," + a.toString();
+                } catch (Exception ex) {
+                    emit("!!!!! ERROR !!!!! - Error in arguments: " + ex.getMessage() + ". Line: " + eleft);
+                    semanticErrors = true;
+                }
             
               CUP$parser$result = parser.getSymbolFactory().newSymbol("arguments",24, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
@@ -1937,7 +2148,14 @@ TablaSimbolos.abrirScope();
 		int eleft = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)).left;
 		int eright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)).right;
 		Object e = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-1)).value;
-		emit("return "+getValue(e.toString()));
+		
+                try {
+                    emit("return " + getValue(e.toString()));
+                } catch (Exception ex) {
+                    emit("!!!!! ERROR !!!!! - Error in return statement: " + ex.getMessage());
+                    semanticErrors = true;
+                }
+            
               CUP$parser$result = parser.getSymbolFactory().newSymbol("return",14, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1946,7 +2164,14 @@ TablaSimbolos.abrirScope();
           case 75: // return ::= RETURN SEMICOLON 
             {
               Object RESULT =null;
-		emit("return");
+		
+                try {
+                    emit("return");
+                } catch (Exception ex) {
+                    emit("!!!!! ERROR !!!!! - Error in return statement: " + ex.getMessage());
+                    semanticErrors = true;
+                }
+            
               CUP$parser$result = parser.getSymbolFactory().newSymbol("return",14, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1959,17 +2184,26 @@ TablaSimbolos.abrirScope();
 		int idright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)).right;
 		Object id = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-2)).value;
 		 
-        if (commentTac) emit("// Read statement");
-        Simbolo simbolo = TablaSimbolos.buscar(id.toString());
-        if (simbolo == null) 
-            throw new IllegalArgumentException("ID " + id.toString() + " not found.");
-        String type = simbolo.type;
-        if (!type.equals("string"))
-            throw new IllegalArgumentException("ID " + id.toString() + " is not a string. Variable destination has to be of value string.");
-        String temp = newTemp(); 
-        emit("read " + temp);
-        emit(id.toString() + "=" + temp);  
-        RESULT = "string:"+id.toString();
+        try {
+            if (commentTac) emit("// Read statement");
+            Simbolo simbolo = TablaSimbolos.buscar(id.toString());
+            if (simbolo == null) {
+                emit("!!!!! ERROR !!!!! - ID " + id.toString() + " not found. Line: " + idleft);
+                semanticErrors = true;
+            }
+            String type = simbolo.type;
+            if (!type.equals("string")) {
+                emit("!!!!! ERROR !!!!! - ID " + id.toString() + " is not a string. Variable destination has to be of value string. Line: " + idleft);
+                semanticErrors = true;
+            }
+            String temp = newTemp(); 
+            emit("read " + temp);
+            emit(id.toString() + "=" + temp);  
+            RESULT = "string:" + id.toString();
+        } catch (Exception ex) {
+            emit("!!!!! ERROR !!!!! - Error in read statement: " + ex.getMessage() + ". Line: " + idleft);
+            semanticErrors = true;
+        }
     
               CUP$parser$result = parser.getSymbolFactory().newSymbol("read",12, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-4)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
@@ -1983,14 +2217,21 @@ TablaSimbolos.abrirScope();
 		int eright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)).right;
 		Object e = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-2)).value;
 		 
-        if (commentTac) emit("// Print statement");
-        String type = getType(e.toString());
-        if (!type.equals("string") && !type.equals("int") && !type.equals("float"))
-            throw new IllegalArgumentException("Only string, int and float values are allowed for print.");
-        String temp = newTemp();
-        emit(temp + "=" + getValue(e.toString()));
-        emit("push " + temp);
-        emit("print"); 
+        try {
+            if (commentTac) emit("// Print statement");
+            String type = getType(e.toString());
+            if (!type.equals("string") && !type.equals("int") && !type.equals("float")) {
+                emit("!!!!! ERROR !!!!! - Only string, int and float values are allowed for print. Line: " + eleft);
+                semanticErrors = true;
+            }
+            String temp = newTemp();
+            emit(temp + "=" + getValue(e.toString()));
+            emit("push " + temp);
+            emit("print"); 
+        } catch (Exception ex) {
+            emit("!!!!! ERROR !!!!! - Error in print statement: " + ex.getMessage() + ". Line: " + eleft);
+            semanticErrors = true;
+        }
     
               CUP$parser$result = parser.getSymbolFactory().newSymbol("print",13, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-4)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
@@ -2004,15 +2245,22 @@ TablaSimbolos.abrirScope();
 		int eright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)).right;
 		Object e = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-1)).value;
 
-        if (commentTac) emit("// If statement ---------------");
-        String tipo = getType(e.toString());
-        if (!tipo.equals("bool"))
-            throw new IllegalArgumentException("Expression has to be of type boolean.");
-        String endLabel = newLabel();
-        String elseLabel = newLabel();
-        stackEndLabels.push(endLabel);
-        stackEndLabels.push(elseLabel);
-        emit("ifFalse " + getValue(e.toString()) + " goto " + elseLabel);
+        try {
+            if (commentTac) emit("// If statement ---------------");
+            String tipo = getType(e.toString());
+            if (!tipo.equals("bool")) {
+                emit("!!!!! ERROR !!!!! - Expression in if has to be of type boolean. Line: " + eleft);
+                semanticErrors = true;
+            }
+            String endLabel = newLabel();
+            String elseLabel = newLabel();
+            stackEndLabels.push(endLabel);
+            stackEndLabels.push(elseLabel);
+            emit("ifFalse " + getValue(e.toString()) + " goto " + elseLabel);
+        } catch (Exception ex) {
+            emit("!!!!! ERROR !!!!! - Error in if statement: " + ex.getMessage() + ". Line: " + eleft);
+            semanticErrors = true;
+        }
     
               CUP$parser$result = parser.getSymbolFactory().newSymbol("NT$3",39, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
@@ -2026,11 +2274,16 @@ TablaSimbolos.abrirScope();
 		int eright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-4)).right;
 		Object e = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-4)).value;
 
-        String elseLabel = stackEndLabels.pop();
-        String endLabel = stackEndLabels.pop();
-        emit("goto " + endLabel);
-        emit(elseLabel + ":");
-        stackEndLabels.push(endLabel);
+        try {
+            String elseLabel = stackEndLabels.pop();
+            String endLabel = stackEndLabels.pop();
+            emit("goto " + endLabel);
+            emit(elseLabel + ":");
+            stackEndLabels.push(endLabel);
+        } catch (Exception ex) {
+            emit("!!!!! ERROR !!!!! - Error in else statement: " + ex.getMessage() + ". Line: " + eleft);
+            semanticErrors = true;
+        }
     
               CUP$parser$result = parser.getSymbolFactory().newSymbol("NT$4",40, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
@@ -2046,8 +2299,13 @@ TablaSimbolos.abrirScope();
 		int eright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-6)).right;
 		Object e = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-6)).value;
 		
-        String endLabel = stackEndLabels.pop();
-        emit(endLabel + ":");
+        try {
+            String endLabel = stackEndLabels.pop();
+            emit(endLabel + ":");
+        } catch (Exception ex) {
+            emit("!!!!! ERROR !!!!! - Error in if-else statement: " + ex.getMessage() + ". Line: " + eleft);
+            semanticErrors = true;
+        }
     
               CUP$parser$result = parser.getSymbolFactory().newSymbol("if",8, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-8)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
@@ -2067,10 +2325,15 @@ TablaSimbolos.abrirScope();
 		int eright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object e = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
 		
-                                Simbolo simbolo = new Simbolo(idVar.toString(),typeVar.toString(),idVarleft,idVarright);
-                                TablaSimbolos.agregarSimbolo(simbolo);
-                                simbolo.setValue(getValue(e.toString()));
-                                emit(typeVar.toString() + ":" + idVar.toString() + "=" + getValue(e.toString()));
+                        try {
+                            Simbolo simbolo = new Simbolo(idVar.toString(),typeVar.toString(),idVarleft,idVarright);
+                            TablaSimbolos.agregarSimbolo(simbolo);
+                            simbolo.setValue(getValue(e.toString()));
+                            emit(typeVar.toString() + ":" + idVar.toString() + "=" + getValue(e.toString()));
+                        } catch (Exception ex) {
+                            emit("!!!!! ERROR !!!!! - Error in for initialization: " + ex.getMessage() + ". Line: " + idVarleft);
+                            semanticErrors = true;
+                        }
                     
               CUP$parser$result = parser.getSymbolFactory().newSymbol("for_initialization",6, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-3)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
@@ -2096,15 +2359,23 @@ if (commentTac) emit("// For loop --------------");
 		int uright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)).right;
 		Object u = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-1)).value;
 
-        String tipo = getType(e.toString());
-        if (!tipo.equals("bool"))
-            throw new IllegalArgumentException("Expression in for has to be of type boolean.");
-        String endLabel = newLabel();
-        String startLabel = newLabel();
-        stackStartLabels.push(startLabel);
-        stackEndLabels.push(endLabel);
-        emit(startLabel + ":");
-        emit("ifFalse " + getValue(e.toString()) + " goto " + endLabel); 
+        try {
+            String tipo = getType(e.toString());
+            if (!tipo.equals("bool")) {
+                emit("!!!!! ERROR !!!!! - 2nd expression in for in for has to be of type boolean. Line: " + eleft);
+                semanticErrors = true;
+            }
+            String endLabel = newLabel();
+            String startLabel = newLabel();
+            stackStartLabels.push(startLabel);
+            stackEndLabels.push(endLabel);
+            emit(startLabel + ":");
+            emit("ifFalse " + getValue(e.toString()) + " goto " + endLabel);
+        } catch (Exception ex) {
+            emit("!!!!! ERROR !!!!! - Error in for loop: " + ex.getMessage() + ". Line: " + eleft);
+            semanticErrors = true;
+        }
+    
               CUP$parser$result = parser.getSymbolFactory().newSymbol("NT$6",42, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -2122,6 +2393,7 @@ if (commentTac) emit("// For loop --------------");
 		int uright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-3)).right;
 		Object u = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-3)).value;
 		
+        try {
             String startLabel = stackStartLabels.pop();
             String endLabel = stackEndLabels.pop();
             String[] partsUnaryOperation = u.toString().split(":");
@@ -2137,7 +2409,11 @@ if (commentTac) emit("// For loop --------------");
             emit(id + "=" + temp2);
             emit("goto " + startLabel);
             emit(endLabel + ":");
-        
+        } catch (Exception ex) {
+            emit("!!!!! ERROR !!!!! - Error in for loop block: " + ex.getMessage() + ". Line: " + eleft);
+            semanticErrors = true;
+        }
+    
               CUP$parser$result = parser.getSymbolFactory().newSymbol("for",5, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-10)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -2150,18 +2426,26 @@ if (commentTac) emit("// For loop --------------");
 		int eright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)).right;
 		Object e = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-1)).value;
  
-            if (commentTac) emit("// While loop ---------------");
-            Simbolo expression = TablaSimbolos.buscar(getValue(e.toString()));
-            if (!expression.getType().equals("bool"))
-                throw new IllegalArgumentException("Expression has to be of type boolean.");
-            if (expression == null) 
-                throw new IllegalArgumentException("Expression not found.");
-            String startLabel = newLabel();
-            String endLabel = newLabel();
-            emit(startLabel + ":");
-            emit("ifFalse " + getValue(e.toString()) + " goto " + endLabel);
-            stackStartLabels.push(startLabel);
-            stackEndLabels.push(endLabel);
+            try {
+                if (commentTac) emit("// While loop ---------------");
+                Simbolo expression = TablaSimbolos.buscar(getValue(e.toString()));
+                if (expression == null) {
+                    emit("!!!!! ERROR !!!!! - Expression not found. Line: " + eleft);
+                    semanticErrors = true;
+                } else if (!expression.getType().equals("bool")) {
+                    emit("!!!!! ERROR !!!!! - Expression has to be of type boolean. Line: " + eleft);
+                    semanticErrors = true;
+                }
+                String startLabel = newLabel();
+                String endLabel = newLabel();
+                emit(startLabel + ":");
+                emit("ifFalse " + getValue(e.toString()) + " goto " + endLabel);
+                stackStartLabels.push(startLabel);
+                stackEndLabels.push(endLabel);
+            } catch (Exception ex) {
+                emit("!!!!! ERROR !!!!! - Error in while loop: " + ex.getMessage() + ". Line: " + eleft);
+                semanticErrors = true;
+            }
             
               CUP$parser$result = parser.getSymbolFactory().newSymbol("NT$7",43, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
@@ -2177,12 +2461,16 @@ if (commentTac) emit("// For loop --------------");
 		int eright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-3)).right;
 		Object e = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-3)).value;
 		 
-            String endLabel = stackEndLabels.pop();
-            String startLabel = stackStartLabels.pop();
-
-            emit("goto " + startLabel);
-            emit(endLabel + ":");
-          
+            try {
+                String endLabel = stackEndLabels.pop();
+                String startLabel = stackStartLabels.pop();
+                emit("goto " + startLabel);
+                emit(endLabel + ":");
+            } catch (Exception ex) {
+                emit("!!!!! ERROR !!!!! - Error in while loop block: " + ex.getMessage() + ". Line: " + eleft);
+                semanticErrors = true;
+            }
+            
               CUP$parser$result = parser.getSymbolFactory().newSymbol("while",7, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-5)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -2195,15 +2483,19 @@ if (commentTac) emit("// For loop --------------");
 		int eright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)).right;
 		Object e = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-1)).value;
 
-    String label = getCurrentSwitchLabel();
-    String expressionType = getType(e.toString());
-    String switchExpression = getCurrentSwitchExpression();
-    if (!expressionType.equals(getType(switchExpression)))
-        throw new IllegalArgumentException("Case expression has to be of the same type as the switch expression.");
-    String temp = newTemp();
-    setCurrentSwitchLabel(newLabel());
-    emit(label + ":");
-    emit("ifFalse " + getValue(e.toString()) + "==" + getValue(getCurrentSwitchExpression()) + " goto " + currentSwitchLabel);
+    try {
+        String label = getCurrentSwitchLabel();
+        String expressionType = getType(e.toString());
+        String switchExpression = getCurrentSwitchExpression();
+        if (!expressionType.equals(getType(switchExpression)))
+            emit("!!!!! ERROR !!!!! - Case expression has to be of the same type as the switch expression. Line: " + eleft);
+        String temp = newTemp();
+        setCurrentSwitchLabel(newLabel());
+        emit(label + ":");
+        emit("ifFalse " + getValue(e.toString()) + "==" + getValue(getCurrentSwitchExpression()) + " goto " + currentSwitchLabel);
+    } catch (Exception ex) {
+        emit("!!!!! ERROR !!!!! - Error in case statement: " + ex.getMessage() + ". Line: " + eleft);
+    }
 
               CUP$parser$result = parser.getSymbolFactory().newSymbol("NT$8",44, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
@@ -2217,8 +2509,12 @@ if (commentTac) emit("// For loop --------------");
 		int eright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-4)).right;
 		Object e = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-4)).value;
  
-    String endLabel = stackEndLabels.peek();
-    emit("goto " + endLabel);
+    try {
+        String endLabel = stackEndLabels.peek();
+        emit("goto " + endLabel);
+    } catch (Exception ex) {
+        emit("!!!!! ERROR !!!!! - Error in case break: " + ex.getMessage());
+    }
 
               CUP$parser$result = parser.getSymbolFactory().newSymbol("NT$9",45, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
@@ -2276,13 +2572,18 @@ if (commentTac) emit("// For loop --------------");
 		int eright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)).right;
 		Object e = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-2)).value;
  
-               if (commentTac) emit("// Switch statement -----------------");
-               TablaSimbolos.abrirScope(); 
-               String endLabel = newLabel(); 
-               stackEndLabels.push(endLabel);
-               setCurrentSwitchExpression(e.toString()); 
-               setCurrentSwitchLabel(newLabel()); 
-           
+                try {
+                    if (commentTac) emit("// Switch statement -----------------");
+                    TablaSimbolos.abrirScope(); 
+                    String endLabel = newLabel(); 
+                    stackEndLabels.push(endLabel);
+                    setCurrentSwitchExpression(e.toString()); 
+                    setCurrentSwitchLabel(newLabel()); 
+                } catch (Exception ex) {
+                    emit("!!!!! ERROR !!!!! - Error in switch statement: " + ex.getMessage() + ". Line: " + eleft);
+                    semanticErrors = true;
+                }
+            
               CUP$parser$result = parser.getSymbolFactory().newSymbol("NT$10",46, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -2305,7 +2606,17 @@ if (commentTac) emit("// For loop --------------");
           case 95: // switch ::= switch_aux RIGHT_BRACE 
             {
               Object RESULT =null;
-		 TablaSimbolos.cerrarScope(); String endLabel = stackEndLabels.pop(); emit(currentSwitchLabel + ":"); emit(endLabel + ":"); 
+		 
+                try {
+                    TablaSimbolos.cerrarScope(); 
+                    String endLabel = stackEndLabels.pop(); 
+                    emit(currentSwitchLabel + ":"); 
+                    emit(endLabel + ":"); 
+                } catch (Exception ex) {
+                    emit("!!!!! ERROR !!!!! - Error in switch statement: " + ex.getMessage() + ". Line: " + eleft);
+                    semanticErrors = true;
+                }
+            
               CUP$parser$result = parser.getSymbolFactory().newSymbol("switch",9, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -2325,7 +2636,16 @@ emit(currentSwitchLabel + ":");
               Object RESULT =null;
               // propagate RESULT from NT$11
                 RESULT = (Object) ((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-2)).value;
-		 TablaSimbolos.cerrarScope(); String endLabel = stackEndLabels.pop(); emit(endLabel + ":"); 
+		 
+                try {
+                    TablaSimbolos.cerrarScope(); 
+                    String endLabel = stackEndLabels.pop(); 
+                    emit(endLabel + ":"); 
+                } catch (Exception ex) {
+                    emit("!!!!! ERROR !!!!! - Error in switch default case: " + ex.getMessage() + ". Line: " + eleft);
+                    semanticErrors = true;
+                }
+            
               CUP$parser$result = parser.getSymbolFactory().newSymbol("switch",9, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-5)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -2338,8 +2658,15 @@ emit(currentSwitchLabel + ":");
 		int tright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object t = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
 
-    if (!t.toString().equals("int") && !t.toString().equals("char")) 
-         throw new IllegalArgumentException("Only int and char arrays are allowed.");
+    try {
+        if (!t.toString().equals("int") && !t.toString().equals("char")) {
+            emit("!!!!! ERROR !!!!! - Only int and char arrays are allowed. Line: " + tleft);
+            semanticErrors = true;
+        }
+    } catch (Exception ex) {
+        emit("!!!!! ERROR !!!!! - Error in array declaration: " + ex.getMessage() + ". Line: " + tleft);
+        semanticErrors = true;
+    }
 
               CUP$parser$result = parser.getSymbolFactory().newSymbol("NT$12",48, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
@@ -2356,10 +2683,17 @@ emit(currentSwitchLabel + ":");
 		int sright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object s = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
 
-    String size = s.toString();
-    if (!getType(size).equals("int"))
-        throw new IllegalArgumentException("Array size has to be an integer."); 
-    
+    try {
+        String size = s.toString();
+        if (!getType(size).equals("int")) {
+            emit("!!!!! ERROR !!!!! - Array size has to be an integer. Line: " + sleft);
+            semanticErrors = true;
+        }
+    } catch (Exception ex) {
+        emit("!!!!! ERROR !!!!! - Error in array size: " + ex.getMessage() + ". Line: " + sleft);
+        semanticErrors = true;
+    }
+
               CUP$parser$result = parser.getSymbolFactory().newSymbol("NT$13",49, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -2380,15 +2714,22 @@ emit(currentSwitchLabel + ":");
 		int idright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object id = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
 		
+    try {
         Simbolo simboloBuscar = TablaSimbolos.buscar(id.toString());
-        if (simboloBuscar != null) 
-            throw new IllegalArgumentException("ID " + id.toString() + " already exists.");
+        if (simboloBuscar != null) {
+            emit("!!!!! ERROR !!!!! - ID " + id.toString() + " already exists. Line: " + idleft);
+            semanticErrors = true;
+        }
         Simbolo simbolo = new Simbolo(id.toString(), t.toString(), idleft, idright);
         simbolo.setArray();
         TablaSimbolos.agregarSimbolo(simbolo);
         RESULT = t.toString() + ":" + id.toString();
         emit("" + t.toString() + ":" + id.toString() + "=newArray " + getValue(s.toString()));
-    
+    } catch (Exception ex) {
+        emit("!!!!! ERROR !!!!! - Error in array declaration: " + ex.getMessage() + ". Line: " + idleft);
+        semanticErrors = true;
+    }
+
               CUP$parser$result = parser.getSymbolFactory().newSymbol("array_declaration_aux",32, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-6)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -2404,18 +2745,25 @@ emit(currentSwitchLabel + ":");
 		int vright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object v = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
 
-     String[] values = v.toString().split(",");
-     int i = 0;
-     String[] infoArray = t.toString().split(":");
-     Simbolo simbolo = TablaSimbolos.buscar(infoArray[1]);  
-     simbolo.setArraySize(values.length);
-     for (String value: values) {
-         if (!getType(value).equals(getType(t.toString())))
-            throw new IllegalArgumentException("Array values have to be of the same type as the array.");
+    try {
+        String[] values = v.toString().split(",");
+        int i = 0;
+        String[] infoArray = t.toString().split(":");
+        Simbolo simbolo = TablaSimbolos.buscar(infoArray[1]);  
+        simbolo.setArraySize(values.length);
+        for (String value: values) {
+            if (!getType(value).equals(getType(t.toString()))) {
+                emit("!!!!! ERROR !!!!! - Array values have to be of the same type as the array. Line: " + tleft);
+                semanticErrors = true;
+            }
             emit(infoArray[1] + "[" + i + "]=" + getValue(value));
             i++;
-     }
-    
+        }
+    } catch (Exception ex) {
+        emit("!!!!! ERROR !!!!! - Error in array declaration with values: " + ex.getMessage() + ". Line: " + tleft);
+        semanticErrors = true;
+    }
+
               CUP$parser$result = parser.getSymbolFactory().newSymbol("NT$14",50, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -2484,17 +2832,27 @@ emit(currentSwitchLabel + ":");
 		int eright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object e = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
 
-    String type = getType(e.toString());
-    if (!type.equals("int"))
-        throw new IllegalArgumentException("Array access index has to be an integer.");
-    Simbolo simbolo = TablaSimbolos.buscar(id.toString());
-    if (simbolo == null) 
-        throw new IllegalArgumentException("ID " + id.toString() + " array not found.");
-    if (!simbolo.isArray())
-        throw new IllegalArgumentException("ID " + id.toString() + " is not an array.");
-    String temp = newTemp();
-    emit(temp + "=" + id.toString() + "[" + getValue(e.toString()) + "]");
-    RESULT = simbolo.type + ":" + temp + ":" + id.toString() + "[" + getValue(e.toString()) + "]";
+    try {
+        String type = getType(e.toString());
+        if (!type.equals("int")) {
+            emit("!!!!! ERROR !!!!! - Array access index has to be an integer. Line: " + eleft);
+            semanticErrors = true;
+        }
+        Simbolo simbolo = TablaSimbolos.buscar(id.toString());
+        if (simbolo == null) {
+            emit("!!!!! ERROR !!!!! - ID " + id.toString() + " array not found. Line: " + idleft);
+            semanticErrors = true;
+        } else if (!simbolo.isArray()) {
+            emit("!!!!! ERROR !!!!! - ID " + id.toString() + " is not an array. Line: " + idleft);
+            semanticErrors = true;
+        }
+        String temp = newTemp();
+        emit(temp + "=" + id.toString() + "[" + getValue(e.toString()) + "]");
+        RESULT = simbolo.type + ":" + temp + ":" + id.toString() + "[" + getValue(e.toString()) + "]";
+    } catch (Exception ex) {
+        emit("!!!!! ERROR !!!!! - Error in array access: " + ex.getMessage() + ". Line: " + idleft);
+        semanticErrors = true;
+    }
 
               CUP$parser$result = parser.getSymbolFactory().newSymbol("NT$15",51, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
@@ -2528,10 +2886,18 @@ emit(currentSwitchLabel + ":");
 		int eright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object e = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
 		
-    if (!getType(a.toString()).equals(getType(e.toString())))
-        throw new IllegalArgumentException("Incompatible types for array position assignment." + getType(a.toString()) + " and " + getType(e.toString()) + " are not compatible.");
-    emit(a.toString().split(":")[2]+"="+getValue(e.toString()));
-RESULT=e.toString();
+    try {
+        if (!getType(a.toString()).equals(getType(e.toString()))) {
+            emit("!!!!! ERROR !!!!! - Incompatible types for array position assignment. Line: " + aleft);
+            semanticErrors = true;
+        }
+        emit(a.toString().split(":")[2] + "=" + getValue(e.toString()));
+        RESULT = e.toString();
+    } catch (Exception ex) {
+        emit("!!!!! ERROR !!!!! - Error in array position assignment: " + ex.getMessage() + ". Line: " + aleft);
+        semanticErrors = true;
+    }
+
               CUP$parser$result = parser.getSymbolFactory().newSymbol("array_position_assignment",31, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -2567,10 +2933,12 @@ RESULT=e.toString();
           case 112: // program_aux ::= main 
             {
               Object RESULT =null;
-		System.out.println(tac); 
-              MipsGenerator generador = new MipsGenerator(tac);
-              generador.procesarTac();
-              generador.getCodigoMIPS();
+		
+                try {
+                    Proyecto1.tac = tac;
+                } catch (Exception ex) {
+                    emit("!!!!! ERROR !!!!! - Error in program: " + ex.getMessage());
+                }
             
               CUP$parser$result = parser.getSymbolFactory().newSymbol("program_aux",35, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }

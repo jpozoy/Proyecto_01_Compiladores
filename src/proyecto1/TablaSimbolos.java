@@ -37,6 +37,7 @@ public class TablaSimbolos {
         tablaActual = new TablaSimbolos(tablaActual);
         
         espaciosPrint = espaciosPrint + "        ";
+        Proyecto1.tablaSimbolos += espaciosPrint + "Inicio de scope:\n";
         //System.out.println(espaciosPrint + "Inicio de scope:");
     }
 
@@ -45,6 +46,7 @@ public class TablaSimbolos {
         if (tablaActual.tablaAnterior == null) 
             return;
         tablaActual = tablaActual.tablaAnterior;
+        Proyecto1.tablaSimbolos += espaciosPrint + "Fin de scope\n";
         //ystem.out.println(espaciosPrint + "Fin de scope");
         espaciosPrint = espaciosPrint.replaceFirst("        ", "");    
         
@@ -52,9 +54,11 @@ public class TablaSimbolos {
 
     // Agregar símbolo al scope actual
     public static boolean agregarSimbolo(Simbolo simbolo) {
-        if (tablaActual.tabla.get(simbolo.name) != null) {
-            throw new IllegalStateException("Error - Identificador duplicado: " +  simbolo.name);
+        Simbolo simboloRevisar = tablaActual.tabla.get(simbolo.name);
+        if (tablaActual.tabla.get(simbolo.name) != null && simboloRevisar.line != simbolo.line && simboloRevisar.column != simbolo.column) {
+            System.err.println("Error - Identificador duplicado: " +  simbolo.name + " en linea " + simbolo.line + " ya existe en linea: " + simboloRevisar.line);
         }
+        Proyecto1.tablaSimbolos += espaciosPrint + "Se agrego un simbolo: " + simbolo + "\n";
         //System.out.println(espaciosPrint + "Se agrego un simbolo: " + simbolo);
         tablaActual.tabla.put(simbolo.name, simbolo);
         return true;

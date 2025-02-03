@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 # tipo    nombre     (      tipo_param1  param1                              )           { 
 rodolfo _funcion_ abreregalo cierraregalo abrecuento # Funcion que suma dos numeros
     # return                                    ;
@@ -28,3 +29,57 @@ _verano_ abreregalo cierraregalo  abrecuento # {
     
     
 cierracuento # }
+=======
+ bromista  _func1_  abreregalo  cupido  _x22_ cierraregalo   abrecuento  #semantico borrar parametro
+
+	 bromista _variable_ entrega -0.01 finregalo  #error sintactico
+	 # cupido  _x22_ entrega 'a' finregalo  \_semantico x22_/
+	 cupido  _miChar_ entrega '!' finregalo #error sintactico
+	 cupido  _miChar2_ entrega '!' finregalo  #sintactico-léxico
+	 rodolfo  _x30_ entrega -1 finregalo 
+	 trueno  _x40_ entrega false finregalo 
+	  cupido  _x50_ entrega 'c'  finregalo 
+	 elfo  abreregalo 7 evergreen 45 cierraregalo  abrecuento  #semantico x22 ,  var
+		 rodolfo  _y_ finregalo 
+		_x22_ entrega 'c' finregalo 
+		 cupido  _ch33_ entrega 'a' finregalo 
+	 cierracuento   hada   abrecuento 
+		 rodolfo  _y_ finregalo #no error o no???
+		 cometa  _str2_ entrega "sdff" finregalo 
+	 cierracuento 
+	 rodolfo _j_ entrega 4 finregalo
+	 duende abreregalo rodolfo _i_ entrega 0 finregalo _i_ snowball 4 navidad _j_ finregalo _i_ quien  cierraregalo  abrecuento  narra  abreregalo _i_ cierraregalo  finregalo  cierracuento  #semantico i y j
+	 narra  abreregalo "Hola mundo" cierraregalo  finregalo 
+	 cometa _stringPrueba_ finregalo
+	 escucha  abreregalo _stringPrueba_ cierraregalo  finregalo 
+	 envia -5.6 finregalo #cambio en retorno genera semantico
+ cierracuento 
+
+  trueno  _func2_  abreregalo  trueno  _b1_ ,   rodolfo  _i1_ cierraregalo   abrecuento 
+	 rodolfo _variable12321_ finregalo  #sintactico
+	 envia finregalo  #generar error con -5.6 y con i1
+  cierracuento  
+
+ cometa  _func3_  abreregalo rodolfo _sdfsdkhf_ cierraregalo   abrecuento  #semantico  cometa 
+	 envia _b1_ finregalo  
+  cierracuento 
+
+ _verano_ abreregalo cierraregalo abrecuento  #sintactico
+\_
+Comentario 1
+_/
+	 bromista  _fl1_ finregalo 
+	 bromista  _fl1_ entrega 56.6 finregalo  #semantico fl1
+	 rodolfo  _in1_ entrega 7 intercambio -14 reyes 6 navidad 7 intercambio 15 finregalo  #semantico fl1 ,  in1
+	 bromista  _fl2_ entrega 3.7 adviento _fl1_ navidad  abreregalo 45.6 magos 5.6 cierraregalo  finregalo  #semantico literal 76
+	
+#comentario 2
+	# _arr_  entrega  10 intercambio _arr_ abreempaque 67 navidad _i_ cierraempaque  nochebuena _func1_  abreregalo _hola_ ,  true ,  "hola mundo" ,  4.5 ,  'a' cierraregalo  finregalo  #semantico func1 ,  retorno func1
+	_fl1_  entrega  4.5 magos 4.3 adviento -0.005 finregalo  #semantico miChar
+	# _miFunc_ abreregalo _miFunc_ abreregalo  cierraregalo  , 'a' cierraregalo  finregalo  #semantico miFunc ,  hola
+	 trueno  _bl0_  entrega  6.7  openslae  8.9 finregalo  #ok
+	# trueno  _bl1_  entrega  _in1_  upatree  _fl1_  gaspar  false  melchor   baltazar  abreregalo _func2_ abreregalo 3 , _in1_ cierraregalo   minstix  56 cierraregalo  finregalo  #semantico in1  upatree  fl1 ,  func2
+	 rodolfo _bl1_ entrega 5 finregalo
+	 envia   _bl1_ finregalo  #semantico
+  cierracuento 
+>>>>>>> Stashed changes

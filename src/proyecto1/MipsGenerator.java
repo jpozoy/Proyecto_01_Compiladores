@@ -92,6 +92,7 @@ public class MipsGenerator {
         else if (line.matches("^call _[a-zA-Z0-9_]+_$")) {
             procCall(line);
         }
+<<<<<<< Updated upstream
         //Procesar pase de parametros
         else if (line.startsWith("push")) {
             procPush(line);
@@ -101,7 +102,77 @@ public class MipsGenerator {
             procReturn(line);
         }
         
+=======
+        else if (line.startsWith("print")) {
+            procesarPrint(line);
+        }
+        else if (line.startsWith("read")) {
+            procesarRead(line);
+        }
+>>>>>>> Stashed changes
     };
+    public void push_all(){
+        // Obtener un registro disponible y cargar el valor
+        text.append("addi $sp, $sp, -40    # Reservar espacio para 10 registros (10 * 4 bytes = 40 bytes)\n");
+        text.append("sw $t0, 36($sp)        # Guardar $t0 en la pila\n");
+        text.append("sw $t1, 32($sp)        # Guardar $t1 en la pila\n");
+        text.append("sw $t2, 28($sp)        # Guardar $t2 en la pila\n");
+        text.append("sw $t3, 24($sp)        # Guardar $t3 en la pila\n");
+        text.append("sw $t4, 20($sp)        # Guardar $t4 en la pila\n");
+        text.append("sw $t5, 16($sp)        # Guardar $t5 en la pila\n");
+        text.append("sw $t6, 12($sp)        # Guardar $t6 en la pila\n");
+        text.append("sw $t7, 8($sp)         # Guardar $t7 en la pila\n");
+        text.append("sw $t8, 4($sp)         # Guardar $t8 en la pila\n");
+        text.append("sw $t9, 0($sp)         # Guardar $t9 en la pila\n");
+    }
+    public void pop_all(){
+        text.append("lw $t9, 0($sp)        # Restaurar $t9\n");
+        text.append("lw $t8, 4($sp)        # Restaurar $t8\n");
+        text.append("lw $t7, 8($sp)        # Restaurar $t7\n");
+        text.append("lw $t6, 12($sp)       # Restaurar $t6\n");
+        text.append("lw $t5, 16($sp)       # Restaurar $t5\n");
+        text.append("lw $t4, 20($sp)       # Restaurar $t4\n");
+        text.append("lw $t3, 24($sp)       # Restaurar $t3\n");
+        text.append("lw $t2, 28($sp)       # Restaurar $t2\n");
+        text.append("lw $t1, 32($sp)       # Restaurar $t1\n");
+        text.append("lw $t0, 36($sp)       # Restaurar $t0\n");
+        text.append("addi $sp, $sp, 40     # Liberar el espacio reservado en la pila\n");
+    }
+    public void procesarPrint(String line) {
+        String reg = gestorRegistros.asignarRegistro();
+        text.append("# Print-----------------------------\n");
+
+        push_all();
+        // Obtener el valor a imprimir de la pila
+        text.append("lw ").append(reg).append(", 0($sp)\n");
+        text.append("addi $sp, $sp, 4\n");
+        // Generar el código MIPS para imprimir el valor
+        text.append("move $a0, ").append(reg).append("\n");
+        text.append("li $v0, 1\nsyscall\n");
+
+        // Liberar el registro
+        gestorRegistros.liberarRegistro(reg);
+
+        pop_all();
+        text.append("# -------------------------\n");
+        }
+
+        public void procesarRead(String line) {
+            String reg = gestorRegistros.asignarRegistroTemp(line.split(" ")[1].trim());
+            text.append("# Read-----------------------------\n");
+
+            push_all();
+
+            // Leer un valor entero desde el teclado
+            text.append("li $v0, 8\n");             // Syscall para leer un entero
+            text.append("syscall\n");
+
+            pop_all();
+
+            text.append("move ").append(reg).append(", $v0\n"); // Guardar el valor leído en el registro
+            text.append("# -------------------------\n");
+        }
+
     //Procesar cada línea independiente
     public void procString(String line) {
         String[] partes = line.split("=", 2);
