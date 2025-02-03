@@ -76,6 +76,10 @@ public class MipsGenerator {
            //System.out.println("Se obtuvo un return: " + line);
            procGetReturn(line);
         }
+        //Procesar temporales t=1
+        else if (line.matches("([a-zA-Z][0-9]*)=([0-9]+)")){
+            procTempAsing(line);
+        }
         //Procesar Temporal
         else if (line.matches("^t[0-9]+=.*$")) {
             procTemp(line);
@@ -316,13 +320,33 @@ public class MipsGenerator {
         if (matcher.find()) {
             String identificador = matcher.group(1);  // El nombre del identificador
             String valor = matcher.group(2);  // El valor (true o false)
-            String newlineData = "";
-            String newlineText = "";
+            // Convertir el valor booleano a 1 o 0
+            String valorNumerico = valor.equals("true") ? "1" : "0";
+            String newlineData = identificador + " .word " +valorNumerico ;
+            data.append(newlineData);
             
             System.out.println("Identificador: " + identificador);
             System.out.println("Valor: " + valor);
         } else {
             System.out.println("No se encontró el patrón: Booleano");
+        }
+    }
+    public void procTempAsing(String line) {
+        String regex = "([a-zA-Z][0-9]*)=([0-9]+)";
+
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(line);
+
+        if (matcher.find()) {
+            String identificador = matcher.group(1); // "t#"
+            String valor = matcher.group(2);         // "#"
+            String reg = gestorRegistros.asignarRegistroTemp(identificador);
+            String newline = "add " + reg + "$zero\n";
+            text.append(newline);
+            System.out.println("Identificador: " + identificador);
+            System.out.println("Valor: " + valor);
+        } else {
+            System.out.println("No se encontró el patrón. Temp valor unico");
         }
     }
 
