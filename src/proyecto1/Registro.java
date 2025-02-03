@@ -21,6 +21,7 @@ class Registro {
         this.disponible = false;
     }
 
+    // Libera el registro, eliminando la etiqueta asociada
     public void liberar() {
         this.etiqueta = null;
         this.disponible = true;

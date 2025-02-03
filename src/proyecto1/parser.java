@@ -742,7 +742,6 @@ public class parser extends java_cup.runtime.lr_parser {
     throws java.lang.Exception
     {
  Symbol sym = lexer.next_token();
-            //System.out.println("Token procesado: " + sym); // Imprime el token procesado
             return sym;
     }
 
@@ -2606,6 +2605,9 @@ if (commentTac) emit("// For loop --------------");
           case 95: // switch ::= switch_aux RIGHT_BRACE 
             {
               Object RESULT =null;
+		int aleft = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)).left;
+		int aright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)).right;
+		Object a = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-1)).value;
 		 
                 try {
                     TablaSimbolos.cerrarScope(); 
@@ -2613,7 +2615,7 @@ if (commentTac) emit("// For loop --------------");
                     emit(currentSwitchLabel + ":"); 
                     emit(endLabel + ":"); 
                 } catch (Exception ex) {
-                    emit("!!!!! ERROR !!!!! - Error in switch statement: " + ex.getMessage() + ". Line: " + eleft);
+                    emit("!!!!! ERROR !!!!! - Error in switch statement: " + ex.getMessage() + ". Line: " + aleft);
                     semanticErrors = true;
                 }
             
@@ -2625,6 +2627,9 @@ if (commentTac) emit("// For loop --------------");
           case 96: // NT$11 ::= 
             {
               Object RESULT =null;
+		int aleft = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)).left;
+		int aright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)).right;
+		Object a = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-2)).value;
 emit(currentSwitchLabel + ":");
               CUP$parser$result = parser.getSymbolFactory().newSymbol("NT$11",47, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
@@ -2636,13 +2641,16 @@ emit(currentSwitchLabel + ":");
               Object RESULT =null;
               // propagate RESULT from NT$11
                 RESULT = (Object) ((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-2)).value;
+		int aleft = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-5)).left;
+		int aright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-5)).right;
+		Object a = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-5)).value;
 		 
                 try {
                     TablaSimbolos.cerrarScope(); 
                     String endLabel = stackEndLabels.pop(); 
                     emit(endLabel + ":"); 
                 } catch (Exception ex) {
-                    emit("!!!!! ERROR !!!!! - Error in switch default case: " + ex.getMessage() + ". Line: " + eleft);
+                    emit("!!!!! ERROR !!!!! - Error in switch default case: " + ex.getMessage() + ". Line: " + aleft);
                     semanticErrors = true;
                 }
             

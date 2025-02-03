@@ -1,17 +1,10 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package proyecto1;
 
 import java.util.ArrayList;
 import java.util.List;
 import java_cup.runtime.Symbol;
 
-/**
- *
- * @author pozoj
- */
+// Clase que representa un símbolo en la tabla de símbolos, con su nombre, tipo, valor, etc.
 public class Simbolo {
     String name;  // Lexema
     String value; // Valor (si es constante)

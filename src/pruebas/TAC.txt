@@ -1,65 +1,36 @@
-_func1_:
-_x22_=pop
-float:_variable_=-0.01
-char:_miChar_=!
-char:_miChar2_=!
-int:_x30_=-1
-bool:_x40_=false
-char:_x50_=c
-t0=7<=45
-ifFalse t0 goto L1
-int:_y_
-_x22_=c
-char:_ch33_=a
-goto L0
-L1:
-int:_y_
-string:_str2_=sdff
-L0:
-int:_j_=4
-int:_i_=0
-t1=4+_j_
-t2=_i_<t1
-L3:
-ifFalse t2 goto L2
-t3=_i_
-push t3
-print
-t4=1
-t5=_i_+t4
-_i_=t5
-goto L3
-L2:
-t6=Hola mundo
-push t6
-print
-string:_stringPrueba_
-read t7
-_stringPrueba_=t7
-return -5.6
-_func2_:
-_b1_=pop
-_i1_=pop
-int:_variable12321_
-return
-_func3_:
-_sdfsdkhf_=pop
-return _b1_
-float:_fl1_
-float:_fl1_=56.6
-t8=7-15
-t9=6+t8
-t10=-14/t9
-t11=7-t10
-int:_in1_=t11
-t12=45.6%5.6
-t13=_fl1_+t12
-t14=3.7^t13
-float:_fl2_=t14
-t15=4.3^-0.005
-t16=4.5%t15
-_fl1_=t16
-t17=6.7!=8.9
-bool:_bl0_=t17
-int:_bl1_=5
-return _bl1_
+_funcion_:
+!!!!! ERROR !!!!! - Error getting value  : Index 1 out of bounds for length 1
+null=pop
+t0=3+4
+return t0
+_funcionSuma_:
+_parametro1_=pop
+_parametro2_=pop
+t1=_parametro1_+_parametro2_
+return t1
+string:_stringVariable_=Hola
+int:_hola_=4
+int:_adios_=7
+bool:_bool_=true
+t2=_hola_+_adios_
+int:_resultadoSuma_=t2
+t3=_hola_-_adios_
+int:_resultadoResta_=t3
+t4=_hola_/3
+int:_resultadoDivision_=t4
+t5=_hola_*5
+int:_resultadoMultiplicacion_=t5
+t6=10%3
+int:_resultadoModulo_=t6
+push int:5
+push int:4
+call _funcionSuma_
+t7=$ret
+t8=5+t7
+t9=_adios_+t8
+t10=3*t9
+t11=4%t10
+t12=_hola_+t11
+int:_operacionCompleja_=t12
+t13=10%3
+int:_resultadoModulo2_=t13

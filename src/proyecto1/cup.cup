@@ -3,10 +3,19 @@ import proyecto1.Lexer;
 import java_cup.runtime.*;
 import java.util.*;
 
-
-// Código del parser
-
-// Código del parser
+/*
+ * Parser CUP para análisis sintáctico y generación de código intermedio (TAC).
+ * 
+ * Este parser utiliza un lexer para el análisis léxico y maneja errores 
+ * sintácticos y semánticos. Incluye la generación de etiquetas y temporales 
+ * para la construcción de código de tres direcciones (Three-Address Code - TAC).
+ * 
+ * Funcionalidades principales:
+ * - Manejo de errores sintácticos con mensajes detallados (línea y columna).
+ * - Evaluación de comparadores y operadores aritméticos.
+ * - Gestión de expresiones switch con soporte para etiquetas de inicio y fin.
+ * - Seguimiento de errores semánticos para depuración.
+ */
 parser code{:
     Lexer lexer;
     @SuppressWarnings("deprecation")
@@ -160,10 +169,25 @@ parser code{:
 init with {::};
 
 scan with {: Symbol sym = lexer.next_token();
-            //System.out.println("Token procesado: " + sym); // Imprime el token procesado
             return sym;:}
 
-// Terminales
+/*
+ * Definición de terminales, no terminales y reglas de precedencia para el parser CUP.
+ * 
+ * Terminales:
+ * - Incluyen tipos de datos primitivos (INTEGER, BOOLEAN, FLOAT, etc.), operadores aritméticos, 
+ *   lógicos, de comparación y símbolos de control de flujo (IF, ELSE, FOR, SWITCH, etc.).
+ * 
+ * No terminales:
+ * - Representan estructuras gramaticales como declaraciones de variables, funciones, 
+ *   estructuras de control, operaciones aritméticas y lógicas, entre otros.
+ * 
+ * Precedencia de operadores:
+ * - Define la prioridad y la asociatividad de los operadores para resolver ambigüedades en expresiones.
+ * - Se establece de izquierda a derecha para la mayoría de los operadores y de derecha a izquierda 
+ *   para operadores unarios, incrementos y exponentiación.
+ */
+
 terminal INTEGER, BOOLEAN, CHAR, STRING, FLOAT;
 terminal LEFT_BRACE, RIGHT_BRACE, LEFT_BRACKET, RIGHT_BRACKET, ASSIGNMENT, LEFT_PARENTHESIS, RIGHT_PARENTHESIS;
 terminal ADD, SUB, MUL, DIV, MOD, TO_THE_POWER;
@@ -177,7 +201,6 @@ terminal ID, INTEGER_VAL, FLOAT_VAL, BOOL_VAL, CHAR_VAL, STRING_VAL;
 terminal COMMA;
 
 
-// No terminales
 non terminal program, code_block, main;
 non terminal comparator, arithmetic_operator;
 non terminal for, for_initialization, while, if, switch, single_case, cases, read, print, return;
@@ -190,15 +213,15 @@ non terminal block;
 non terminal literal, value_assignment, array_position_assignment, array_declaration_aux;
 non terminal case1, switch_aux, program_aux;
 
-precedence left OR;       // Disyunción tiene menor precedencia
-precedence left AND;      // Conjunción tiene mayor precedencia que OR
-precedence right NOT;     // NOT tiene la mayor precedencia
+precedence left OR;       
+precedence left AND;      
+precedence right NOT;     
 precedence left EQUAL_TO, NOT_EQUAL_TO;
 precedence left LESS_THAN, LESS_OR_EQUAL_THAN, GREATER_THAN, GREATER_OR_EQUAL_THAN;
 precedence left ADD, SUB;
 precedence left MUL, DIV, MOD;
-precedence right TO_THE_POWER;  // Precedencia más alta para potenciación
-precedence right INCREMENT, DECREMENT, NOT;  // Precedencia para unarios
+precedence right TO_THE_POWER; 
+precedence right INCREMENT, DECREMENT, NOT; 
 precedence right LEFT_PARENTHESIS;
 
 start with program;
@@ -208,6 +231,23 @@ type ::= INTEGER:tipo {:RESULT = "int"; :} // Cargar tipos unicamente
     | STRING:tipo {:RESULT = "string"; :}
     | FLOAT:tipo {:RESULT = "float"; :};
 
+/*
+ * Producción: unary_operation
+ * 
+ * Esta regla define las operaciones unarias de incremento (++) y decremento (--) aplicadas a identificadores (ID).
+ * 
+ * Validaciones semánticas:
+ * 1. Verificación de existencia: Se consulta la tabla de símbolos para comprobar si el ID está declarado.
+ * 2. Verificación de valor: Se asegura que el ID tenga un valor asignado antes de realizar la operación unaria.
+ * 3. Verificación de tipo: La operación solo se permite para variables de tipo entero ("int").
+ * 
+ * Manejo de errores:
+ * - Si alguna validación falla, se emite un mensaje de error detallado indicando el tipo de error y la línea correspondiente.
+ * - Se utiliza `semanticErrors = true` para marcar la existencia de errores semánticos en la operación.
+ * 
+ * Generación de código intermedio (Three-Address Code - TAC):
+ * - Si las validaciones son exitosas, se genera una instrucción en formato `int:ID:ID:OP`, donde `OP` es `+` para incremento o `-` para decremento.
+ */
 
 unary_operation ::= ID:id INCREMENT 
               {: 
@@ -256,6 +296,22 @@ unary_operation ::= ID:id INCREMENT
                }
               :};
 
+/*
+ * Producción: arithmetic_operator
+ * 
+ * Esta regla define los operadores aritméticos básicos que se utilizan para construir expresiones matemáticas.
+ * 
+ * Operadores soportados:
+ * - Suma (+)
+ * - Resta (-)
+ * - Multiplicación (*)
+ * - División (/)
+ * - Módulo (%)
+ * - Potencia (^)
+ * 
+ * Generación de código:
+ * - Cada operador se asigna directamente a un símbolo correspondiente en `RESULT` para su posterior uso en la generación de código intermedio (TAC).
+ */
 arithmetic_operator ::= ADD {:RESULT = "+"; :}
     | SUB {:RESULT = "-"; :}
     | MUL {:RESULT = "*"; :}
@@ -263,12 +319,52 @@ arithmetic_operator ::= ADD {:RESULT = "+"; :}
     | MOD {:RESULT = "%"; :}
     | TO_THE_POWER {:RESULT = "^"; :};
 
+
+/*
+ * Producción: comparator
+ * 
+ * Esta regla define los operadores de comparación utilizados en expresiones condicionales.
+ * 
+ * Comparadores soportados:
+ * - Menor que (<)
+ * - Menor o igual que (<=)
+ * - Mayor que (>)
+ * - Mayor o igual que (>=)
+ * - Igual a (==)
+ * - Distinto de (!=)
+ * 
+ * Generación de código:
+ * - Cada comparador se asigna directamente a su representación en `RESULT`, facilitando su integración en evaluaciones de condiciones lógicas en el código intermedio (TAC).
+ */
+
 comparator ::= LESS_THAN {:RESULT = "<"; :}
           | LESS_OR_EQUAL_THAN {:RESULT = "<="; :}
           | GREATER_THAN {:RESULT = ">"; :}
           | GREATER_OR_EQUAL_THAN {:RESULT = ">="; :}
           | EQUAL_TO {:RESULT = "=="; :}
           | NOT_EQUAL_TO {:RESULT = "!="; :}; 
+
+/*
+ * Producción: literal
+ * 
+ * Esta regla gestiona la interpretación de literales en el código fuente, incluyendo variables, números, booleanos, caracteres y cadenas de texto.
+ * 
+ * Casos manejados:
+ * 1. **Identificadores (ID)**:
+ *    - Se consulta la tabla de símbolos (`TablaSimbolos`) para verificar si la variable está declarada.
+ *    - Si no existe, se emite un error semántico.
+ *    - Si existe, se obtiene su tipo y nombre para generar la representación en `RESULT`.
+ * 
+ * 2. **Valores literales**:
+ *    - **Enteros (INTEGER_VAL)**, **flotantes (FLOAT_VAL)**, **booleanos (BOOL_VAL)**, **caracteres (CHAR_VAL)** y **cadenas de texto (STRING_VAL)**:
+ *    - Cada tipo se procesa para generar su representación con el formato `tipo:valor` (por ejemplo, `int:5` o `string:"hola"`).
+ *    - Se manejan errores de procesamiento mediante `try-catch` para garantizar la robustez del análisis semántico.
+ * 
+ * Manejo de errores:
+ * - Se emiten mensajes detallados en caso de errores, indicando el tipo de problema y la línea donde ocurrió.
+ * - `semanticErrors = true` se activa si ocurre un error durante el análisis.
+ */
+
 literal ::= ID:id {:
          try {
           Simbolo simbolo = TablaSimbolos.buscar(id.toString());
@@ -323,7 +419,20 @@ literal ::= ID:id {:
             }
          :};
 
-// Reglas de la gramática
+// Producción: expression
+//
+// La regla `expression` define una expresión matemática o lógica en el lenguaje, la cual puede ser un literal,
+// una expresión entre paréntesis, una operación aritmética entre dos expresiones, una operación unaria,
+// una llamada a función, una comparación, una operación lógica AND, OR o NOT, o un acceso a un arreglo.
+//
+// En cada caso, se evalúa el tipo de los operandos y se realiza la operación correspondiente,
+// validando que los tipos sean compatibles y generando el código intermedio necesario.
+//
+// Generación de código:
+// - Para las operaciones aritméticas y lógicas se generan instrucciones en código intermedio (TAC),
+//   como comparaciones, operaciones y asignaciones de valores temporales.
+//
+
 expression ::= literal:i {:
     try {
         RESULT = i.toString();
@@ -474,6 +583,23 @@ expression ::= literal:i {:
               semanticErrors = true;
           }
          :};
+
+// Producción: statement
+//
+// La regla `statement` define una declaración o sentencia en el lenguaje, como:
+// - Sentencias de control como `for`, `while`, `if`, `switch`.
+// - Declaraciones de variables o funciones.
+// - Operaciones de lectura o escritura (read/print).
+// - Sentencias de retorno o invocación de funciones.
+// - Asignaciones de valores o de elementos de un arreglo.
+//
+// Se genera código intermedio correspondiente para cada tipo de sentencia, manejando las estructuras de control
+// y las modificaciones de valores, así como la asignación de variables temporales en el caso de las operaciones unarias.
+//
+// Generación de código:
+// - Se crean instrucciones de control de flujo como `goto`, `if` y ciclos (`while`, `for`).
+// - Las declaraciones de variables se gestionan con instrucciones de asignación de memoria y valores iniciales.
+//
 statement ::= for // Ya
             | while // Ya
             | if // Ya
@@ -516,18 +642,58 @@ statement ::= for // Ya
             | block
             | error SEMICOLON;
 
-
+// Producción: block
+//
+// La regla `block` define un bloque de código delimitado por llaves `{}`. 
+// Dentro de este bloque se ejecutan varias sentencias y expresiones.
+// Al abrir un bloque de código, se crea un nuevo ámbito para las variables y funciones.
+// Al cerrarlo, se elimina ese ámbito de la tabla de símbolos.
+//
+// Generación de código:
+// - Se generan instrucciones para manejar el alcance de las variables mediante operaciones de apertura y cierre de ámbitos.
+// - Dentro del bloque se procesan sentencias y expresiones generando el código correspondiente.
+//
 block ::= LEFT_BRACE {:TablaSimbolos.abrirScope();:} code_block RIGHT_BRACE {:TablaSimbolos.cerrarScope();:}
                 |error RIGHT_BRACE ;
+
+// Producción: code_block
+//
+// La regla `code_block` define un bloque de código que puede contener sentencias y expresiones.
+// Un `code_block` puede ser una secuencia de sentencias, una secuencia de expresiones, o una combinación de ambas.
+//
+// Generación de código:
+// - Las sentencias dentro de un `code_block` se traducen en código intermedio correspondiente.
+// - Se procesan expresiones y sentencias en el orden en que aparecen en el bloque.
+//
 code_block ::= statement
                 | expression
                 | statement code_block
                 | expression code_block;
 
+// Producción: declaration
+//
+// La regla `declaration` define una declaración en el lenguaje, que puede ser una declaración de variable o de función.
+// Una variable se declara con un tipo y una posible inicialización de valor, mientras que una función se declara con su tipo de retorno y parámetros.
+//
+// Generación de código:
+// - Para las declaraciones de variables se reserva espacio en memoria y se inicializan si es necesario.
+// - Las funciones se registran en la tabla de símbolos y se genera código para su cuerpo de acuerdo con su definición.
+//
 declaration ::= variable_declaration:type 
                 | function_declaration:type ;
 
-//Crear entrada de variable
+
+// Asignación de valor a una variable
+//
+// La regla `value_assignment` representa la asignación de un valor a una variable previamente declarada.
+// El identificador (`ID`) se busca en la tabla de símbolos y se verifica que exista, y que el tipo de la variable sea compatible con el valor a asignar. 
+// Si el tipo no coincide, se genera un error semántico. 
+// Además, se actualiza el valor de la variable en la tabla de símbolos.
+//
+// Generación de código:
+// - Se verifica si el identificador ya ha sido declarado.
+// - Se asegura que el tipo de la variable sea compatible con el valor asignado.
+// - El valor se asigna a la variable en la tabla de símbolos y se emite el código correspondiente.
 value_assignment ::= ID:id ASSIGNMENT expression:e SEMICOLON {:
                         try {
                             Simbolo simbolo = TablaSimbolos.buscar(id.toString());
@@ -546,6 +712,18 @@ value_assignment ::= ID:id ASSIGNMENT expression:e SEMICOLON {:
                             semanticErrors = true;
                         }
                     :};
+
+
+// Declaración de variable
+//
+// La regla `variable_declaration` define la declaración de una variable con o sin inicialización.
+// Se verifica si la variable ya ha sido declarada antes en la tabla de símbolos. Si no es así, se agrega una nueva entrada.
+// Si la variable tiene un valor de inicialización, este valor se asigna correctamente al declarar la variable.
+//
+// Generación de código:
+// - Se reserva espacio en memoria para la variable declarada.
+// - Si es necesario, se asigna el valor inicial de la variable y se emite el código correspondiente.
+// - Se añade la variable a la tabla de símbolos.
 variable_declaration ::= type:typeVar ID:idVar SEMICOLON {:
                         try {
                             if (commentTac) emit("// Variable " + idVar.toString() + " declaration");
@@ -572,7 +750,16 @@ variable_declaration ::= type:typeVar ID:idVar SEMICOLON {:
                         }
                     :};
 
-//Crear entrada de función
+// Declaración de función
+//
+// La regla `function_declaration` define la declaración de una función, incluyendo su tipo de retorno, nombre y parámetros.
+// Se registran los parámetros de la función en la tabla de símbolos y se genera el código necesario para invocar la función, 
+// procesando los parámetros pasados durante la llamada.
+//
+// Generación de código:
+// - Se registra la función en la tabla de símbolos junto con su tipo de retorno y sus parámetros.
+// - Se emite código para procesar la llamada a la función, incluyendo la carga de los parámetros en memoria.
+// - El código de la función es generado después de la declaración del bloque de código.
 function_declaration ::= type:typeVar ID:idVar LEFT_PARENTHESIS parameters:p RIGHT_PARENTHESIS LEFT_BRACE 
                         {:
                             try {
@@ -598,6 +785,15 @@ function_declaration ::= type:typeVar ID:idVar LEFT_PARENTHESIS parameters:p RIG
                             }
                         :} 
                         code_block RIGHT_BRACE;
+
+// Declaración de parámetros de función
+//
+// La regla `parameters` define los parámetros de una función, especificando su tipo y nombre.
+// Los parámetros se agregan a la tabla de símbolos de manera que la función pueda acceder a ellos durante su ejecución.
+//
+// Generación de código:
+// - Los parámetros se registran en la tabla de símbolos como variables locales dentro de la función.
+// - Se emite el código para la declaración de cada parámetro.
 parameters ::= type:typeVar ID:idVar {:
                 try {
                     Simbolo simbolo = new Simbolo(idVar.toString(),typeVar.toString(),idVarleft,idVarright);
@@ -621,6 +817,15 @@ parameters ::= type:typeVar ID:idVar {:
                 }
             :}| {:RESULT="";:};
 
+// Llamada a una función
+//
+// La regla `function_call` se utiliza para invocar una función previamente declarada.
+// Se verifica que la función exista en la tabla de símbolos, que sea efectivamente una función, 
+// y que el número de argumentos proporcionados coincida con el número de parámetros esperados.
+//
+// Generación de código:
+// - Se emite el código necesario para llamar a la función y gestionar su retorno.
+// - Se asegura que los argumentos sean correctos antes de realizar la llamada.
 function_call ::= ID:id LEFT_PARENTHESIS arguments:args RIGHT_PARENTHESIS 
                     {: 
                     try {
@@ -649,6 +854,13 @@ function_call ::= ID:id LEFT_PARENTHESIS arguments:args RIGHT_PARENTHESIS
                     }
                     :};
 
+// Expresión de retorno
+//
+// La regla `return` define la declaración de un retorno de valor desde una función.
+// El valor de retorno se verifica y se emite el código correspondiente para retornar dicho valor.
+//
+// Generación de código:
+// - Se emite el código para retornar el valor especificado desde la función.
 arguments ::= expression:e {:
                 try {
                     emit("push " + e.toString());
@@ -668,6 +880,14 @@ arguments ::= expression:e {:
                 }
             :}| {:RESULT = "";:};
 
+// Entrada de datos
+//
+// La regla `read` representa la entrada de datos por parte del usuario para una variable especificada.
+// Se verifica que el identificador sea una variable de tipo `string`, y se genera el código necesario para leer un valor de entrada.
+//
+// Generación de código:
+// - Se lee el valor de entrada del usuario y se almacena en la variable correspondiente.
+// - Se emite el código necesario para la operación de entrada.
 return ::= RETURN expression:e SEMICOLON {:
                 try {
                     emit("return " + getValue(e.toString()));
@@ -685,6 +905,14 @@ return ::= RETURN expression:e SEMICOLON {:
                 }
             :};
 
+// Instrucción de impresión
+//
+// La regla `print` define la instrucción para imprimir el valor de una expresión en la salida estándar.
+// Se verifica que el tipo de la expresión sea compatible con los tipos válidos para la impresión (string, int, float), 
+// y se genera el código para imprimir el valor.
+//
+// Generación de código:
+// - Se emite el código para imprimir el valor de la expresión especificada.
 read ::= INPUT LEFT_PARENTHESIS ID:id RIGHT_PARENTHESIS SEMICOLON 
     {: 
         try {
@@ -709,6 +937,14 @@ read ::= INPUT LEFT_PARENTHESIS ID:id RIGHT_PARENTHESIS SEMICOLON
         }
     :};
 
+// Producción: print
+//
+// La regla print define una declaración de impresión en el lenguaje, donde se evalúa una expresión y se imprime su valor.
+//
+// Generación de código:
+// - La expresión se evalúa y se verifica su tipo para asegurar que sea uno de los tipos permitidos: string, int o float.
+// - Si la expresión es válida, se genera un código temporal para su valor y se empuja a la pila para su impresión.
+// - Si el tipo no es válido, se genera un error semántico.
 print ::= PRINT LEFT_PARENTHESIS expression:e RIGHT_PARENTHESIS SEMICOLON 
     {: 
         try {
@@ -728,6 +964,14 @@ print ::= PRINT LEFT_PARENTHESIS expression:e RIGHT_PARENTHESIS SEMICOLON
         }
     :};
 
+// Producción: if
+//
+// La regla if define una estructura condicional que evalúa una expresión booleana y ejecuta un bloque de código si la condición es verdadera, o un bloque alternativo si es falsa.
+//
+// Generación de código:
+// - Se verifica que la expresión tenga tipo booleano, de lo contrario, se genera un error semántico.
+// - Se generan etiquetas de salto para manejar el flujo del código dependiendo de si la condición es verdadera o falsa.
+// - Si la condición es falsa, se salta al bloque `else`, si está presente, y se ejecuta el bloque correspondiente.
 if ::= IF LEFT_PARENTHESIS expression:e RIGHT_PARENTHESIS {:
         try {
             if (commentTac) emit("// If statement ---------------");
@@ -766,6 +1010,12 @@ if ::= IF LEFT_PARENTHESIS expression:e RIGHT_PARENTHESIS {:
         }
     :}; 
 
+// Producción: for_initialization
+//
+// La regla for_initialization define la inicialización de una variable dentro de un bucle `for`, que se realiza con un tipo de dato y una expresión de asignación.
+//
+// Generación de código:
+// - Se reserva espacio en la tabla de símbolos para la variable, se asigna su valor según la expresión dada y se genera el código correspondiente para la asignación.
 for_initialization ::= type:typeVar ID:idVar ASSIGNMENT expression:e
                         {:
                         try {
@@ -779,6 +1029,14 @@ for_initialization ::= type:typeVar ID:idVar ASSIGNMENT expression:e
                         }
                     :};
 
+// Producción: for
+//
+// La regla for define un bucle que itera hasta que una condición booleana especificada sea falsa.
+//
+// Generación de código:
+// - Se verifica que la expresión de la condición tenga tipo booleano, de lo contrario, se genera un error semántico.
+// - Se generan etiquetas de salto para controlar el inicio y final del bucle.
+// - El cuerpo del bucle se ejecuta mientras la condición sea verdadera. Al final de cada iteración, se evalúa una operación unaria (incremento o decremento) sobre la variable de control del bucle.
 for ::= {:if (commentTac) emit("// For loop --------------");:} 
         FOR LEFT_PARENTHESIS for_initialization SEMICOLON expression:e SEMICOLON unary_operation:u RIGHT_PARENTHESIS {:
         try {
@@ -819,6 +1077,15 @@ for ::= {:if (commentTac) emit("// For loop --------------");:}
             semanticErrors = true;
         }
     :};
+
+// Producción: while
+//
+// La regla while define un bucle que continúa ejecutándose mientras se cumpla una condición booleana.
+//
+// Generación de código:
+// - Se verifica que la expresión de la condición tenga tipo booleano. Si no es así, se genera un error semántico.
+// - Se generan etiquetas de salto para gestionar el inicio y el fin del bucle. 
+// - Al final de cada iteración, el flujo vuelve a la condición para evaluar si el bucle debe continuar ejecutándose.
 while ::= WHILE LEFT_PARENTHESIS expression:e RIGHT_PARENTHESIS
             {: 
             try {
@@ -855,6 +1122,14 @@ while ::= WHILE LEFT_PARENTHESIS expression:e RIGHT_PARENTHESIS
             }
             :};
 
+// Producción: case1
+//
+// La regla case1 define un caso dentro de una estructura `switch`, donde se compara una expresión con la expresión del `switch`.
+//
+// Generación de código:
+// - Se verifica que el tipo de la expresión del caso coincida con el tipo de la expresión del `switch`.
+// - Se genera un código que compara ambas expresiones y, si no coinciden, salta al siguiente caso o a la etiqueta correspondiente.
+// - En caso de que coincidan, se ejecuta el bloque de código asociado al caso.
 case1 ::= CASE expression:e COLON {:
     try {
         String label = getCurrentSwitchLabel();
@@ -899,7 +1174,16 @@ switch_aux ::= SWITCH LEFT_PARENTHESIS expression:e RIGHT_PARENTHESIS
                 }
             :} 
             cases;
-switch ::= switch_aux RIGHT_BRACE 
+
+// Producción: switch
+//
+// La regla switch define una estructura de control que permite ejecutar uno de varios bloques de código basados en la comparación de una expresión con valores especificados en casos.
+//
+// Generación de código:
+// - Se verifica que todos los casos tengan el mismo tipo que la expresión del `switch`.
+// - Se gestionan las etiquetas de salto para controlar el flujo del programa según el caso que coincida con el valor de la expresión.
+// - Si no hay coincidencias, se ejecuta el bloque `default`, si está presente.
+switch ::= switch_aux:a RIGHT_BRACE 
             {: 
                 try {
                     TablaSimbolos.cerrarScope(); 
@@ -907,18 +1191,18 @@ switch ::= switch_aux RIGHT_BRACE
                     emit(currentSwitchLabel + ":"); 
                     emit(endLabel + ":"); 
                 } catch (Exception ex) {
-                    emit("!!!!! ERROR !!!!! - Error in switch statement: " + ex.getMessage() + ". Line: " + eleft);
+                    emit("!!!!! ERROR !!!!! - Error in switch statement: " + ex.getMessage() + ". Line: " + aleft);
                     semanticErrors = true;
                 }
             :}
-            | switch_aux DEFAULT COLON {:emit(currentSwitchLabel + ":");:} code_block RIGHT_BRACE 
+            | switch_aux:a DEFAULT COLON {:emit(currentSwitchLabel + ":");:} code_block RIGHT_BRACE 
             {: 
                 try {
                     TablaSimbolos.cerrarScope(); 
                     String endLabel = stackEndLabels.pop(); 
                     emit(endLabel + ":"); 
                 } catch (Exception ex) {
-                    emit("!!!!! ERROR !!!!! - Error in switch default case: " + ex.getMessage() + ". Line: " + eleft);
+                    emit("!!!!! ERROR !!!!! - Error in switch default case: " + ex.getMessage() + ". Line: " + aleft);
                     semanticErrors = true;
                 }
             :};
@@ -964,6 +1248,14 @@ LEFT_BRACKET expression:s {:
         semanticErrors = true;
     }
 :};
+
+// Producción: array_declaration_aux
+//
+// La regla array_declaration_aux define la declaración de un arreglo con un tipo específico (int o char) y un tamaño especificado por una expresión.
+//
+// Generación de código:
+// - Se verifica que el tipo del arreglo sea int o char, de lo contrario se genera un error semántico.
+// - Se valida que el tamaño del arreglo sea un valor entero válido y que la declaración cumpla con las restricciones de tipos.
 array_declaration ::= array_declaration_aux:t ASSIGNMENT LEFT_BRACE array_values:v {:
     try {
         String[] values = v.toString().split(",");

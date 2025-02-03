@@ -20,8 +20,13 @@ import java.util.Scanner;
 
 
 public class Proyecto1 {
+    // Variables para almacenar el TAC y la tabla de simbolos
     public static String tac = "";
+
+    // Variables para almacenar el TAC y la tabla de simbolos
     public static String tablaSimbolos = "";
+
+    // Método para mostrar el menú de opciones
     public static void menu() throws FileNotFoundException {
         Scanner scanner = new Scanner(System.in);
         boolean continuar = true;
@@ -34,7 +39,8 @@ public class Proyecto1 {
             System.out.println("5. Analizar sintacticamente y semánticamente e imprimir tabla de simbolos");
             System.out.println("6. Analizar sintacticamente y semánticamente e imprimir TAC (Código de tres direcciones)");
             System.out.println("7. Analizar sintacticamente y semánticamente");
-            System.out.println("8. Salir");
+            System.out.println("8. Generar MIPS");
+            System.out.println("9. Salir");
             System.out.print("Seleccione una opcion: ");
 
             String opcion = "";
@@ -104,6 +110,9 @@ public class Proyecto1 {
                     }
                 break;
                 case "8":
+                    generarMIPS();
+                    break;
+                case "9":
                     continuar = false;
             }
         }
@@ -114,6 +123,7 @@ public class Proyecto1 {
         menu();
     }
 
+    // Método para analizar el archivo de entrada y generar el TAC y la tabla de símbolos
     public static void parse() {
         tac = "";
         tablaSimbolos = "";
@@ -137,6 +147,22 @@ public class Proyecto1 {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    
+    // Método para generar el código MIPS
+    public static void generarMIPS(){
+        try {
+            MipsGenerator mipsGenerator = new MipsGenerator(tac);
+            mipsGenerator.procesarTac();
+            String codigo = mipsGenerator.getCodigoMIPS();
+            System.out.println(codigo);
+            BufferedWriter writer = new BufferedWriter(new FileWriter("src/pruebas/mips.asm"));
+            writer.write(codigo);
+        } catch (Exception e) {
+            System.err.println("ERROR: No se pudo generar el codigo MIPS");
+            e.printStackTrace();
+        }
+        
     }
     public static void generarLexer(String path) throws Exception {
         String[] arr = {path};
