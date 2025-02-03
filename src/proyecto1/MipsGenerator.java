@@ -12,6 +12,8 @@ public class MipsGenerator {
     private StringBuilder codigoMips;
     //Estructura de gestor de registros
     private GestorRegistros gestorRegistros;
+    // Lista temporal para almacenar líneas de pop
+    private List<String> popLines;
     
     //Encontrar y reservar estructuras estaticas: Strings, Arrays
     
@@ -21,6 +23,7 @@ public class MipsGenerator {
             this.data = new StringBuilder(".data\n");
             this.text = new StringBuilder(".text\nmain:\n");
             this.gestorRegistros = new GestorRegistros();
+            this.popLines = new ArrayList<>();
     }
     public void procesarTac() {
         //Separar lineas de codigo intermedio
@@ -39,18 +42,61 @@ public class MipsGenerator {
     }
     //Procesar cada linea
     public void procesarLinea(String line) {
-        //Si es un string
+        //Procesar parametros si hay en la lista y ya no se encuentra más el patron de parametro
+        if(!popLines.isEmpty() && !line.matches("^_[a-zA-Z0-9_]+_=pop$")) {
+            System.out.println("Se van a procesar los parametros");
+            procPops();
+        }
+        //Procesar la declaración de string:
         if(line.startsWith("string:")){
             procString(line);
-        //Si es una etiqueta de funcion
-        } else if (line.matches("^_[a-zA-Z0-9_]+:$")) {
-            text.append(line + "\n");
-        } else if(line.startsWith("int:")) {
-            procDecAsing(line);
         }
+        //Si es una etiquea L1, L2, L3....
+        else if (line.startsWith("^L\\d+:$")){
+            text.append(line + "\n");
+        }
+        //Procesar un salto "goto"
+        else if (line.startsWith("goto")){
+            text.append(line);
+        }
+        //Procesar una etiqueta de funcion
+        else if (line.matches("^_[a-zA-Z0-9_]+:$")) {
+            text.append(line + "\n");
+        }
+        //Procesar declaracion de booleano 
+        else if (line.startsWith("bool:")) {
+            procDecBool(line);
+        }
+        //Procesar declaracion y asignación de enteros
+        else if(line.startsWith("int:")) {
+            procDecAsing(line);
+        } 
+        //Procesar la obtención de retorno
+        else if (line.matches("t\\d+=\\$ret")) {
+           //System.out.println("Se obtuvo un return: " + line);
+           procGetReturn(line);
+        }
+        //Procesar Temporal
         else if (line.matches("^t[0-9]+=.*$")) {
             procTemp(line);
+        //Procesar al recibir un de un parametro
+        } 
+        else if (line.matches("^_[a-zA-Z0-9_]+_=pop$")) {
+            popLines.add(line);
+        }  
+        //Procesar llamada de función
+        else if (line.matches("^call _[a-zA-Z0-9_]+_$")) {
+            procCall(line);
         }
+        //Procesar pase de parametros
+        else if (line.startsWith("push")) {
+            procPush(line);
+        }
+        //Procesar un return
+        else if (line.startsWith("return")) {
+            procReturn(line);
+        }
+        
     };
     //Procesar cada línea independiente
     public void procString(String line) {
@@ -101,14 +147,9 @@ public class MipsGenerator {
             String operando1 = matcher.group(1).trim(); // Primer operando
             String operador = matcher.group(2).trim();  // Operador
             String operando2 = matcher.group(3).trim(); // Segundo operando
-
-            //System.out.println("Etiqueta Temporal: " + etiqueta);
-            //System.out.println("Operando 1: " + operando1);
-            //System.out.println("Operador: " + operador);
-            //System.out.println("Operando 2: " + operando2);
             traducirTemp(etiqueta, operando1, operando2, operador);
         } else {
-            System.out.println("Formato inválido: " + line);
+            System.out.println("Formato inválidos: " + line);
         }
     }
     public void traducirTemp(String temporal, String op1, String op2, String operador) {
@@ -169,6 +210,119 @@ public class MipsGenerator {
                 break;
             default:
                 System.out.println("Error: Operador no reconocido.");
+        }
+    }
+
+    private void procPops() {
+        for (int i = popLines.size() - 1; i >= 0; i--) {
+            String line = popLines.get(i);
+            System.out.println("<<<"+line);
+            //Obtener solo la el _identificador_ de la linea
+            Pattern pattern = Pattern.compile("^(_[a-zA-Z0-9_]+)_=pop$");
+            Matcher matcher = pattern.matcher(line);
+            if (matcher.find()) {
+                String identificador = matcher.group(1); // Captura solo el identificador
+                String registro = gestorRegistros.asignarRegistroTemp(identificador); //Reservar un registro disponible para el
+                //Cargar parametro de pila en el registro y liberar el espacio
+                String newline = "lw "+registro+", 0($sp)\naddi $sp, $sp, 4\n";
+                text.append(newline);
+                //Guardar el paramatro en el epacio en memoria del identificador 
+                String newlineLoad = "sw "+ registro + ", " + identificador + "\n";
+                text.append(newlineLoad);
+                gestorRegistros.liberarRegistro(registro);
+            } else {
+                System.out.println("No coincide el patrón: _nombre_ en procPops");
+            }
+            
+        }
+        // Vaciar la lista después de procesar
+        popLines.clear();
+    }
+    
+    public void procPush(String line) {
+        System.out.println("Se Proceso un push: ###"+line);
+        Pattern pattern = Pattern.compile("int:(-?\\d+)"); // Buscar "int:" seguido de números
+        Matcher matcher = pattern.matcher(line);
+        if (matcher.find()) {
+            System.out.println(matcher.group(1)); // Imprime "t28"
+            String reg = gestorRegistros.asignarRegistro();
+            text.append("li ").append(reg).append(", ").append(matcher.group(1)).append("\n");
+            String newline = "addi $sp, $sp, -4\nsw " + reg + ", 0($sp)\n";
+            text.append(newline);
+            //Liberar registro
+            gestorRegistros.liberarRegistro(reg);
+        }
+    }
+
+    public void procCall(String line) {
+        System.out.println("Se Proceso una llamada a funcion: "+line);
+        Pattern pattern = Pattern.compile("call (_[a-zA-Z0-9_]+_)");
+        Matcher matcher = pattern.matcher(line);
+        
+        if (matcher.find()) {
+            String nombreFuncion = matcher.group(1); // Extrae el nombre de la función
+            System.out.println("Nombre de la función: " + nombreFuncion);
+            String newline = "jal " + nombreFuncion + "\n";
+            text.append(newline);
+        } else {
+            System.out.println("No se encontró el patrón.");
+        }
+    }
+
+    
+
+    public void procReturn(String line) {
+        String resultado, reg;
+        System.out.println("Se Proceso un return: "+line);
+        // Expresión regular para identificar "t#" (donde # es un número)
+        Pattern pattern = Pattern.compile("t\\d+");
+        Matcher matcher = pattern.matcher(line);
+        if (matcher.find()) {
+            resultado = matcher.group();
+            reg = gestorRegistros.obtenerRegistroPorEtiqueta(resultado);
+            //El retorno se devolvera en el registro $v0
+            String newLineText = "add $v0, "+ reg +", $zero\njr $ra\n"; //Mover el registro donde se guardo el retorno, al registro v0
+            text.append(newLineText); 
+            gestorRegistros.liberarRegistro(reg); //Liberar el registro pasado a $v0
+        }
+    }
+    
+    public void procGetReturn(String line) {
+        Pattern pattern = Pattern.compile("(t\\d+)=([\\$a-zA-Z0-9_]+)");
+        Matcher matcher = pattern.matcher(line);
+
+        if (matcher.find()) {
+            String temp = matcher.group(1); // Extrae "t7"
+            String valor = matcher.group(2); // Extrae "$ret"
+            //Asignar un registro al temporal que contiene el return
+            String reg = gestorRegistros.asignarRegistroTemp(temp);
+            String newline = "move, " + reg + ", $v0\n";
+            text.append(newline);
+
+            System.out.println("Registro: " + temp);
+            System.out.println("Valor: " + valor);
+        } else {
+            System.out.println("No coincide con el patrón: Return");
+        }
+    }
+
+    public void procDecBool(String line) {
+         // Expresión regular
+        String regex = "bool:([a-zA-Z0-9_]+)=([true|false]+)";
+
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(line);
+
+        if (matcher.find()) {
+            String identificador = matcher.group(1);  // El nombre del identificador
+            String valor = matcher.group(2);  // El valor (true o false)
+            String newlineData = "";
+            String newlineText = "";
+            
+            System.out.println("Identificador: " + identificador);
+            System.out.println("Valor: " + valor);
+        } else {
+            System.out.println("No se encontró el patrón: Booleano");
         }
     }
 

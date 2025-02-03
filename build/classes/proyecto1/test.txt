@@ -1,5 +1,16 @@
+# tipo    nombre     (      tipo_param1  param1                              )           { 
+rodolfo _funcion_ abreregalo cierraregalo abrecuento # Funcion que suma dos numeros
+    # return                                    ;
+    envia 3 navidad 4 finregalo 
+cierracuento
+# } 
+
+rodolfo _funcionSuma_ abreregalo rodolfo _parametro1_, rodolfo _parametro2_ cierraregalo abrecuento # Funcion que suma dos numeros
+    # return                                    ;
+    envia _parametro1_ navidad _parametro2_ finregalo 
+cierracuento
 _verano_ abreregalo cierraregalo  abrecuento # {
-    cometa _stringVariable_ entrega "Hola"  finregalo<
+    cometa _stringVariable_ entrega "Hola"  finregalo
     
    
     # Prueba con operaciones aritmeticas
@@ -12,7 +23,7 @@ _verano_ abreregalo cierraregalo  abrecuento # {
     rodolfo _resultadoMultiplicacion_ entrega _hola_ nochebuena 5 finregalo
     rodolfo _resultadoModulo_ entrega 10 magos 3 finregalo
     #rodolfo _resultadoPotencia_ entrega _hola_ adviento _adios_ finregalo
-    rodolfo _operacionCompleja_ entrega _hola_ navidad 4 magos 3 nochebuena _adios_ finregalo
+    rodolfo _operacionCompleja_ entrega _hola_ navidad 4 magos 3 nochebuena  _adios_ navidad 5 navidad _funcionSuma_ abreregalo 4,5 cierraregalo finregalo
     rodolfo _resultadoModulo2_ entrega 10 magos 3 finregalo
     
     
